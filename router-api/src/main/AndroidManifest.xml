@@ -1,0 +1,7 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.dovar.router_api">
+
+    <application>
+        <service android:name=".multiprocess.MultiRouterService"/>
+    </application>
+</manifest>
