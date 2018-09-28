@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -18,7 +19,9 @@ import com.dovar.router_api.compiler.RouterInjector;
 import com.dovar.router_api.multiprocess.IMultiProcess;
 import com.dovar.router_api.multiprocess.MultiRouterService;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -86,13 +89,16 @@ public final class Router {
     private void initByCompiler() {
         if (mRouterContext == null) return;
         try {
-            //通过注解生成的代理类的全路径名
-            String mProxyClassFullName = "com.touchtv.router.RouterInitProxy";
-
-            Class<?> proxyClass = Class.forName(mProxyClassFullName);
-            RouterInjector injector = (RouterInjector) proxyClass.newInstance();
-            if (injector != null) {
-                injector.init(mRouterContext, mProcessName);
+            //通过注解生成的代理类的存放路径
+            String mProxyClassPackage = "com.touchtv.router";
+            List<String> classFileNames = RouterUtil.getFileNameByPackageName(mRouterContext, mProxyClassPackage);
+            for (String mProxyClassFullName : classFileNames
+                    ) {
+                Class<?> proxyClass = Class.forName(mProxyClassFullName);
+                RouterInjector injector = (RouterInjector) proxyClass.newInstance();
+                if (injector != null) {
+                    injector.init(mRouterContext, mProcessName);
+                }
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -100,6 +106,10 @@ public final class Router {
             e.printStackTrace();
         } catch (InstantiationException e) {
             e.printStackTrace();
+        } catch (IOException mE) {
+            mE.printStackTrace();
+        } catch (PackageManager.NameNotFoundException mE) {
+            mE.printStackTrace();
         }
     }
 
