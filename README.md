@@ -44,7 +44,7 @@ libModule中R文件里的id不再是静态常量，而是静态变量，所以�
             }
     设置applicationId：
             if (!isDebugMode.toBoolean()) {
-                applicationId "com.touchtv.touchtv"
+                applicationId "com.dovar.router"
             }
     使用sourceSets配置AndroidManifest等
            sourceSets {

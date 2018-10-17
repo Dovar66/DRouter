@@ -29,11 +29,11 @@ import javax.tools.Diagnostic;
 @AutoService(Processor.class)
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class RouterProcessor extends AbstractProcessor {
-    private final String proxyClassPackage = "com.touchtv.router";
+    private final String proxyClassPackage = "com.dovar.router";
     private final String proxyClassSimpleName = "RouterInitProxy";
-    private final String routerInjectorPackage = "com.touchtv.router_api.compiler";
+    private final String routerInjectorPackage = "com.dovar.router_api.compiler";
     private final String routerInjectorSimpleName = "RouterInjector";
-    private final String BaseApplicationLogicPackage = "com.touchtv.router_api.router";
+    private final String BaseApplicationLogicPackage = "com.dovar.router_api.router";
     private final String BaseApplicationLogicSimpleName = "BaseApplicationLogic";
 
     private Filer filer;

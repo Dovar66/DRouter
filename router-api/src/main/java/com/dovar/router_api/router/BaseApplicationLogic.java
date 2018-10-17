@@ -30,21 +30,4 @@ public class BaseApplicationLogic {
     public void onConfigurationChanged(Configuration newConfig) {
     }
 
-    public static void registerModule(Class logicClass, Application app) {
-        if (logicClass == null) return;
-        try {
-            BaseApplicationLogic instance = (BaseApplicationLogic) logicClass.newInstance();
-            instance.setApplication(app);
-            instance.onCreate();
-        } catch (Exception mE) {
-            mE.printStackTrace();
-        }
-    }
-
-    public void init(Application app, String processName) {
-        if(processName!=null&&processName.equals("com.touchtv.touchtv")) {
-//            registerModule(LiveAppInit.class,app);
-        }
-    }
-
 }

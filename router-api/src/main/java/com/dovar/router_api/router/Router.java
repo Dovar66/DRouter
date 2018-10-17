@@ -29,7 +29,6 @@ import java.util.concurrent.Executors;
 /**
  * Function:
  * 1.路由应该可以拦截不安全的跳转或者设定一些特定的拦截服务。
- *
  */
 public final class Router {
     private static boolean enableLog = false;
@@ -88,24 +87,28 @@ public final class Router {
      */
     private void initByCompiler() {
         if (mRouterContext == null) return;
+        //通过注解生成的代理类的存放路径，最末位的“.”不能省略，否则会匹配到com.dovar.router_api包
+        String mProxyClassPackage = "com.dovar.router.";
         try {
-            //通过注解生成的代理类的存放路径
-            String mProxyClassPackage = "com.touchtv.router";
             List<String> classFileNames = RouterUtil.getFileNameByPackageName(mRouterContext, mProxyClassPackage);
             for (String mProxyClassFullName : classFileNames
                     ) {
-                Class<?> proxyClass = Class.forName(mProxyClassFullName);
-                RouterInjector injector = (RouterInjector) proxyClass.newInstance();
-                if (injector != null) {
-                    injector.init(mRouterContext, mProcessName);
+                //前面找到的classFileNames中可能会存在非RouterInjector子类
+                //所以在循环内捕获proxyClass.newInstance()的异常
+                try {
+                    Class<?> proxyClass = Class.forName(mProxyClassFullName);
+                    RouterInjector injector = (RouterInjector) proxyClass.newInstance();
+                    if (injector != null) {
+                        injector.init(mRouterContext, mProcessName);
+                    }
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
                 }
             }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
         } catch (IOException mE) {
             mE.printStackTrace();
         } catch (PackageManager.NameNotFoundException mE) {
@@ -320,7 +323,7 @@ public final class Router {
             getThreadPool().submit(task);
             mResponse.setMessage("本次Action是异步任务");
         } else {//同步
-            mResponse = mAction.invoke(mRouterRequest.getBundle(), null);
+            mResponse = mAction.invoke(mRouterRequest.getBundle(), mRouterRequest.getCallback());
         }
         if (mResponse == null) {
             mResponse = new RouterResponse();
