@@ -138,4 +138,4 @@ libModule中R文件里的id不再是静态常量，而是静态变量，所以�
 
 2.异步请求逻辑待优化。
 
-等待subtree
+subtree合并
