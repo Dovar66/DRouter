@@ -1,6 +1,8 @@
 package com.dovar.router_compiler;
 
 import com.dovar.router_annotation.Router;
+import com.dovar.router_annotation.RouterAnno;
+import com.dovar.router_annotation.RouterStr;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
@@ -26,9 +28,11 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
+
 @AutoService(Processor.class)
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class RouterProcessor extends AbstractProcessor {
+
     private Filer filer;
     private Messager messager;
     private String moduleName;
@@ -108,7 +112,10 @@ public class RouterProcessor extends AbstractProcessor {
             if (e.getKind() == ElementKind.CLASS) {
                 String name = e.getAnnotation(Router.class).process();
                 ClassName className = ClassName.get((TypeElement) e);
-                initBuilder.beginControlFlow("if(processName!=null&&processName.equals(\"" + name + "\"))")
+                initBuilder.addStatement("$T process=\"" + name + "\"", String.class);
+                initBuilder.addStatement("if(processName!=null&&processName.equals(\"" + RouterAnno.MainProcess + "\"))")
+                        .addStatement("process=app.getPackageName()");
+                initBuilder.beginControlFlow("if(processName!=null&&processName.equals(process))")
                         .addStatement("$N($T.class,app)", registerModule, className)
                         .endControlFlow();
             }

@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.dovar.router_annotation.RouterStr;
 import com.dovar.router_api.IMultiRouter;
 import com.dovar.router_api.compiler.RouterInjector;
 import com.dovar.router_api.multiprocess.IMultiProcess;
@@ -32,7 +33,6 @@ import java.util.concurrent.Executors;
  */
 public final class Router {
     private static boolean enableLog = false;
-    private static volatile Router instance;//进程内单例
 
     private boolean hasInit = false;
     private Application mRouterContext;
@@ -46,14 +46,19 @@ public final class Router {
     }
 
     public static Router instance() {
-        if (instance == null) {
-            synchronized (Router.class) {
-                if (instance == null) {
-                    instance = new Router();
-                }
-            }
-        }
-        return instance;
+        return SingletonHolder.router;
+    }
+
+    private static class SingletonHolder {
+        private static final Router router = new Router();
+    }
+
+    /**
+     * 反序列化时会被调用
+     * 如果实现了序列化，加入readResolve()方法，防止Router被反序列化时重新生成新的Router对象
+     */
+    private Object readResolve() {
+        return instance();
     }
 
     /**
@@ -88,7 +93,7 @@ public final class Router {
     private void initByCompiler() {
         if (mRouterContext == null) return;
         //通过注解生成的代理类的存放路径，最末位的“.”不能省略，否则会匹配到com.dovar.router_api包
-        String mProxyClassPackage = "com.dovar.router.";
+        String mProxyClassPackage = RouterStr.proxyClassPackage + ".";
         try {
             List<String> classFileNames = RouterUtil.getFileNameByPackageName(mRouterContext, mProxyClassPackage);
             for (String mProxyClassFullName : classFileNames
