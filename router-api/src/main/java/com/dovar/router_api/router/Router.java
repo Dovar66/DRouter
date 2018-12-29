@@ -1,7 +1,12 @@
 package com.dovar.router_api.router;
 
 
+import android.app.Activity;
 import android.app.Application;
+import android.app.Fragment;
+import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.Observer;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -11,14 +16,19 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.dovar.router_annotation.RouterStr;
 import com.dovar.router_api.IMultiRouter;
 import com.dovar.router_api.compiler.RouterInjector;
+import com.dovar.router_api.eventbus.Event;
+import com.dovar.router_api.eventbus.EventCallback;
+import com.dovar.router_api.eventbus.LiveEventBus;
 import com.dovar.router_api.multiprocess.IMultiProcess;
 import com.dovar.router_api.multiprocess.MultiRouterService;
+import com.dovar.router_api.service.IService;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -26,6 +36,9 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Function:
@@ -38,8 +51,11 @@ public final class Router {
     private Application mRouterContext;
     private String mProcessName;
 
-    private HashMap<String, Provider> mProviders;
+//    private HashMap<String, Provider> mProviders;
     private HashMap<String, ActivityAction> mActivityMap;//待优化，需要放到单独的类中管理
+    private HashMap<String, IService> mServiceMap;
+
+    private int asyncTimeoutDelay = 5000;//执行异步任务的超时时间
 
     private Router() {
 
@@ -130,6 +146,24 @@ public final class Router {
         return Postcard.obtain(path);
     }
 
+    public <T> T getService(String key) {
+        try {
+            IService s = mServiceMap.get(key);
+            return (T) s;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void registerService(String key, IService service) {
+        if (TextUtils.isEmpty(key)) return;
+        if (mServiceMap == null) {
+            mServiceMap = new HashMap<>();
+        }
+        mServiceMap.put(key, service);
+    }
+
     /**
      * 注册provider到路由
      *
@@ -138,11 +172,12 @@ public final class Router {
      */
     void registerProvider(String key, Provider mProvider) {
         if (TextUtils.isEmpty(key)) return;
-        if (mProviders == null) {
+       /* if (mProviders == null) {
             mProviders = new HashMap<>();
         }
-        mProviders.put(key, mProvider);
+        mProviders.put(key, mProvider);*/
     }
+
 
     /**
      * 注册Activity到路由
@@ -163,8 +198,8 @@ public final class Router {
      *
      * @param mRequest 请求参数
      */
-    Action findRequestAction(RouterRequest mRequest) {
-        if (mProviders == null) {
+    IService localRoute(RouterRequest mRequest) {
+       /* if (mProviders == null) {
             if (hasInit) {
                 initByCompiler();
             } else {
@@ -184,7 +219,19 @@ public final class Router {
             }
         } else {
             return new ErrorAction(false, "Not found the provider.");
+        }*/
+
+        if (mServiceMap == null) {
+            if (hasInit) {
+                initByCompiler();
+            } else {
+                return null;
+            }
+            if (mServiceMap == null) {
+                return null;
+            }
         }
+        return mServiceMap.get(mRequest.getProvider());
     }
 
     /**
@@ -210,14 +257,15 @@ public final class Router {
         return mAction;
     }
 
-    private ExecutorService threadPool = null;
+    private ScheduledExecutorService threadPool = null;
 
-    private ExecutorService getThreadPool() {
+    private ScheduledExecutorService getThreadPool() {
         if (null == threadPool) {
-            threadPool = Executors.newCachedThreadPool();
+            threadPool = Executors.newScheduledThreadPool(8);
         }
         return threadPool;
     }
+
 
     static class LocalTask implements Callable<RouterResponse> {
         private Bundle mRequestData;
@@ -318,14 +366,48 @@ public final class Router {
     /**
      * 只在本地路由执行
      */
+   /* @NonNull
+    public RouterResponse localRoute(RouterRequest mRouterRequest) {
+        RouterResponse mResponse = new RouterResponse();
+        Action mAction = Router.instance().findRequestAction(mRouterRequest);
+        if (mAction == null) return mResponse;
+        if (mAction.isAsync(mRouterRequest.getBundle())) {//异步
+            final LocalTask task = new LocalTask(mRouterRequest.getBundle(), mRouterRequest.getCallback(), mAction);
+            final Future f = getThreadPool().submit(task);
+            getThreadPool().schedule(new Runnable() {
+                @Override
+                public void run() {
+                    // FIXME: 2018/12/28 待检查
+                    if (f.isDone() || f.isCancelled()) return;
+                    f.cancel(true);
+                }
+            }, asyncTimeoutDelay, TimeUnit.MILLISECONDS);
+            mResponse.setMessage("本次Action是异步任务");
+        } else {//同步
+            mResponse = mAction.invoke(mRouterRequest.getBundle(), mRouterRequest.getCallback());
+        }
+        if (mResponse == null) {
+            mResponse = new RouterResponse();
+        }
+        return mResponse;
+    }*/
+
     @NonNull
     public RouterResponse localRoute(RouterRequest mRouterRequest) {
         RouterResponse mResponse = new RouterResponse();
         Action mAction = Router.instance().findRequestAction(mRouterRequest);
         if (mAction == null) return mResponse;
         if (mAction.isAsync(mRouterRequest.getBundle())) {//异步
-            LocalTask task = new LocalTask(mRouterRequest.getBundle(), mRouterRequest.getCallback(), mAction);
-            getThreadPool().submit(task);
+            final LocalTask task = new LocalTask(mRouterRequest.getBundle(), mRouterRequest.getCallback(), mAction);
+            final Future f = getThreadPool().submit(task);
+            getThreadPool().schedule(new Runnable() {
+                @Override
+                public void run() {
+                    // FIXME: 2018/12/28 待检查
+                    if (f.isDone() || f.isCancelled()) return;
+                    f.cancel(true);
+                }
+            }, asyncTimeoutDelay, TimeUnit.MILLISECONDS);
             mResponse.setMessage("本次Action是异步任务");
         } else {//同步
             mResponse = mAction.invoke(mRouterRequest.getBundle(), mRouterRequest.getCallback());
@@ -363,5 +445,36 @@ public final class Router {
             mResponse.setMessage("未启用广域路由，如需启用请让Application实现IMultiProcess接口");
             return mResponse;
         }
+    }
+
+
+    public static Observer<Object> subscribe(LifecycleOwner owner, String name, final EventCallback listener) {
+        if (TextUtils.isEmpty(name) || listener == null) {
+            return null;
+        }
+        Observer<Object> ob = new Observer<Object>() {
+            @Override
+            public void onChanged(@Nullable Object e) {
+                if (e instanceof Event) {
+                    listener.onEvent((Event) e);
+                }
+            }
+        };
+        LiveEventBus.instance().subscribe(name, owner, ob);
+        return ob;
+    }
+
+    public static void unsubscribe(String name, Observer<Object> observer) {
+        if (null == observer) {
+            return;
+        }
+        LiveEventBus.instance().unsubscribe(name, observer);
+    }
+
+    public static void publish(Event event) {
+        if (null == event || TextUtils.isEmpty(event.getName())) {
+            return;
+        }
+        LiveEventBus.instance().publish(event.getName(), event);
     }
 }

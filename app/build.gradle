@@ -1,0 +1,28 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 27
+
+
+
+    defaultConfig {
+        applicationId "com.dovar.app"
+        minSdkVersion 19
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.0"
+    }
+}
+
+dependencies {
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+
+    //公共服务层
+//    implementation project(':common_service')
+
+    //开发阶段可以根据需要，选择下面的一个或多个组件进行编译，减少编译时长
+    //但发布测试或生产包时必须全部编译
+//    implementation project(':module_a')
+//    implementation project(':module_b')
+//    implementation project(':module_c')
+}
