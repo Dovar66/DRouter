@@ -5,14 +5,19 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Bundle;
+import android.os.DeadObjectException;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 
+import com.dovar.router_api.Debugger;
 import com.dovar.router_api.ILocalRouterAIDL;
+import com.dovar.router_api.router.Router;
 import com.dovar.router_api.router.RouterUtil;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * auther by heweizong on 2018/8/17
@@ -61,6 +66,7 @@ public class MultiRouter {
         if (service == null) return;
         Intent mIntent = new Intent();
         mIntent.setClass(mApplication, service);
+        Debugger.d("connectLocalRouter\t" + process);
         mApplication.bindService(mIntent, new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
@@ -74,6 +80,7 @@ public class MultiRouter {
                 //新增或更新
                 mLocalRouterAIDLMap.put(process, lrAIDL);
                 mLocalRouterConnectionMap.put(process, this);
+                Debugger.d("connectLocalRouter成功");
             }
 
             @Override
@@ -86,6 +93,11 @@ public class MultiRouter {
     @NonNull
     MultiRouterResponse route(MultiRouterRequest routerRequest) {
         String process = routerRequest.getProcess();
+        //主进程
+        if (process.equals(mApplication.getPackageName())) {
+            return RouterUtil.createMultiResponse(Router.instance().localRoute(RouterUtil.backToRequest(routerRequest)));
+        }
+        //其他进程
         if (mLocalRouterAIDLMap == null) {
             mLocalRouterAIDLMap = new HashMap<>();
         }
@@ -106,6 +118,28 @@ public class MultiRouter {
             MultiRouterResponse mResponse = new MultiRouterResponse();
             mResponse.setMessage("广域路由服务正在启动中...");
             return mResponse;
+        }
+    }
+
+    void publish(String key, Bundle bundle) {
+        //主进程
+        Router.instance().localPublish(key, bundle);
+        //其他进程
+        if (mLocalRouterAIDLMap == null) {
+            mLocalRouterAIDLMap = new HashMap<>();
+        }
+        for (Map.Entry<String, ILocalRouterAIDL> entry : mLocalRouterAIDLMap.entrySet()
+                ) {
+            try {
+                entry.getValue().publish(key, bundle);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+                Debugger.e(e.getMessage());
+                //会不会导致foreach异常
+                if (e instanceof DeadObjectException){
+                    mLocalRouterAIDLMap.remove(entry.getKey());
+                }
+            }
         }
     }
 }

@@ -15,6 +15,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.dovar.router_api.Debugger;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -43,23 +45,19 @@ public class LiveEventBus {
         return SingletonHolder.DEFAULT_BUS;
     }
 
-    synchronized <T> Observable<T> with(String key, Class<T> type) {
+    synchronized Observable with(String key) {
         if (!bus.containsKey(key)) {
             bus.put(key, new BusMutableLiveData<>(key));
         }
-        return (Observable<T>) bus.get(key);
+        return bus.get(key);
     }
 
-    Observable<Object> with(String key) {
-        return with(key, Object.class);
-    }
-
-    public void subscribe(String key, LifecycleOwner owner, Observer<Object> observer) {
+    public void subscribe(String key, LifecycleOwner owner, Observer observer) {
         if (TextUtils.isEmpty(key) || owner == null || observer == null) return;
         with(key).observe(owner, observer);
     }
 
-    public void unsubscribe(String key, Observer<Object> observer) {
+    public void unsubscribe(String key, Observer observer) {
         if (TextUtils.isEmpty(key) || observer == null) return;
         if (bus.containsKey(key)) {
             with(key).removeObserver(observer);
@@ -70,7 +68,7 @@ public class LiveEventBus {
         if (TextUtils.isEmpty(key)) return;
         //为了防止事件滥用，在发送事件时需要检查事件类型是否为已注册的类型，如果不是则不允许发送。
         if (bus.containsKey(key)) {
-            with(key).setValue(obj);
+            with(key).postValue(obj);
         }
     }
 

@@ -2,6 +2,8 @@ package com.dovar.router_api.router;
 
 import android.content.Context;
 
+import com.dovar.router_api.multiprocess.Postcard;
+
 /**
  * 用于activity跳转
  */

@@ -1,10 +1,7 @@
 package com.dovar.router_api.router;
 
 
-import android.app.Activity;
 import android.app.Application;
-import android.app.Fragment;
-import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
 import android.content.ComponentName;
@@ -18,42 +15,40 @@ import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.dovar.router_annotation.RouterStr;
+import com.dovar.router_api.Debugger;
 import com.dovar.router_api.IMultiRouter;
+import com.dovar.router_api.compiler.PathInjector;
 import com.dovar.router_api.compiler.RouterInjector;
-import com.dovar.router_api.eventbus.Event;
 import com.dovar.router_api.eventbus.EventCallback;
 import com.dovar.router_api.eventbus.LiveEventBus;
 import com.dovar.router_api.multiprocess.IMultiProcess;
+import com.dovar.router_api.multiprocess.MultiRouter;
 import com.dovar.router_api.multiprocess.MultiRouterService;
-import com.dovar.router_api.service.IService;
+import com.dovar.router_api.multiprocess.Postcard;
+import com.dovar.router_api.router.ui.UriRouter;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * 如果是多进程应用，那么每个进程都会存在一个Router对象，但{@link com.dovar.router_api.multiprocess.MultiRouter}只存在于主进程中，所有Router的跨进程操作最终都会指向MultiRouter.
  * Function:
  * 1.路由应该可以拦截不安全的跳转或者设定一些特定的拦截服务。
  */
 public final class Router {
-    private static boolean enableLog = false;
-
     private boolean hasInit = false;
     private Application mRouterContext;
     private String mProcessName;
 
-//    private HashMap<String, Provider> mProviders;
-    private HashMap<String, ActivityAction> mActivityMap;//待优化，需要放到单独的类中管理
-    private HashMap<String, IService> mServiceMap;
+    private HashMap<String, Provider> mProviders;
 
     private int asyncTimeoutDelay = 5000;//执行异步任务的超时时间
 
@@ -77,27 +72,15 @@ public final class Router {
         return instance();
     }
 
-    /**
-     * 开启日志打印
-     */
-    public static void setDebugMode(boolean enable) {
-        enableLog = enable;
-    }
-
-    static void log(String info) {
-        if (enableLog && !TextUtils.isEmpty(info)) {
-            Log.d("Router", info);
-        }
-    }
-
+    //所有进程都应该调用init初始化路由
     public void init(Application app) {
         if (!hasInit) {
             this.mRouterContext = app;
             this.mProcessName = RouterUtil.getProcessName(app);
+            initByCompiler();
             if (mRouterContext instanceof IMultiProcess) {
                 bindMultiRouter();
             }
-            initByCompiler();
             hasInit = true;
         }
     }
@@ -118,9 +101,15 @@ public final class Router {
                 //所以在循环内捕获proxyClass.newInstance()的异常
                 try {
                     Class<?> proxyClass = Class.forName(mProxyClassFullName);
-                    RouterInjector injector = (RouterInjector) proxyClass.newInstance();
-                    if (injector != null) {
-                        injector.init(mRouterContext, mProcessName);
+                    Object injector = proxyClass.newInstance();
+                    if (injector instanceof RouterInjector) {
+                        //注册Provider和Action
+                        ((RouterInjector) injector).init(mRouterContext, mProcessName);
+                    } else if (injector instanceof PathInjector) {
+                        //注册Path，只会注册在主进程
+                        UriRouter.initMap(((PathInjector) injector).init(mRouterContext, mProcessName));
+                    } else {
+                        Debugger.d(mProxyClassFullName);
                     }
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
@@ -137,31 +126,91 @@ public final class Router {
         }
     }
 
-    public RouterRequest.Builder provider(String providerKey) {
-        return RouterRequest.obtain().provider(providerKey);
+    private ServiceConnection multiServiceConnection;
+    private IMultiRouter mMultiRouter;
+
+    /**
+     * 为当前进程绑定广域服务，从而拿到{@link IMultiRouter}
+     */
+    public void bindMultiRouter() {
+        if (mRouterContext == null) return;
+        if (mProcessName == null) {
+            mProcessName = RouterUtil.getProcessName(mRouterContext);
+        }
+        Intent mIntent = new Intent();
+        Debugger.d("bindMultiRouter");
+        mIntent.setClass(mRouterContext, MultiRouterService.class);
+        if (multiServiceConnection == null) {
+            multiServiceConnection = new ServiceConnection() {
+                @Override
+                public void onServiceConnected(ComponentName name, IBinder service) {
+                    mMultiRouter = IMultiRouter.Stub.asInterface(service);
+                    Debugger.d("onServiceConnected\t" + mMultiRouter);
+                    try {
+                        mMultiRouter.connectLocalRouter(mProcessName);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onServiceDisconnected(ComponentName name) {
+                    Debugger.d("onServiceDisconnected");
+                }
+            };
+        }
+        mRouterContext.bindService(mIntent, multiServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
-    //界面跳转
-    public Postcard navigator(String path) {
+    /**
+     * 为当前进程解绑广域服务
+     */
+    public void unbindMultiRouter() {
+        if (null == multiServiceConnection) {
+            return;
+        }
+        mRouterContext.unbindService(multiServiceConnection);
+        mMultiRouter = null;
+    }
+
+    //------------------------------------------------界面跳转 begin--------------------------------------------------//
+    public static Postcard navigator(String path) {
+        return Router.instance().multiNavigateTo(path);
+    }
+
+    @NonNull
+    public Postcard localNavigateTo(String path) {
+        Postcard p = Postcard.obtain(path);
+        p.setDestination(UriRouter.findActivity(path));
+        return p;
+    }
+
+    @NonNull
+    private Postcard multiNavigateTo(String path) {
+        if (mRouterContext instanceof IMultiProcess) {
+            if (mMultiRouter != null) {
+                try {
+                    return mMultiRouter.navigateTo(path);
+                } catch (RemoteException mE) {
+                    mE.printStackTrace();
+                    Debugger.e(mE.getMessage());
+                }
+            } else {
+                bindMultiRouter();
+                Debugger.d("进程：(" + mProcessName + ")正在连接广域路由...");
+            }
+        } else {
+            Debugger.e("未启用广域路由，如需启用请让Application实现IMultiProcess接口");
+            return localNavigateTo(path);
+        }
         return Postcard.obtain(path);
     }
+    //------------------------------------------------界面跳转 end----------------------------------------------------//
 
-    public <T> T getService(String key) {
-        try {
-            IService s = mServiceMap.get(key);
-            return (T) s;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
-    public void registerService(String key, IService service) {
-        if (TextUtils.isEmpty(key)) return;
-        if (mServiceMap == null) {
-            mServiceMap = new HashMap<>();
-        }
-        mServiceMap.put(key, service);
+    //------------------------------------------------组件间通信 begin--------------------------------------------------//
+    public RouterRequest.Builder provider(String providerKey) {
+        return RouterRequest.obtain().provider(providerKey);
     }
 
     /**
@@ -172,34 +221,20 @@ public final class Router {
      */
     void registerProvider(String key, Provider mProvider) {
         if (TextUtils.isEmpty(key)) return;
-       /* if (mProviders == null) {
+        if (mProviders == null) {
             mProviders = new HashMap<>();
         }
-        mProviders.put(key, mProvider);*/
+        mProviders.put(key, mProvider);
     }
 
-
-    /**
-     * 注册Activity到路由
-     *
-     * @param key
-     * @param mAction
-     */
-    void registerActivity(String key, ActivityAction mAction) {
-        if (TextUtils.isEmpty(key)) return;
-        if (mActivityMap == null) {
-            mActivityMap = new HashMap<>();
-        }
-        mActivityMap.put(key, mAction);
-    }
 
     /**
      * 寻找Action
      *
      * @param mRequest 请求参数
      */
-    IService localRoute(RouterRequest mRequest) {
-       /* if (mProviders == null) {
+    Action findRequestAction(RouterRequest mRequest) {
+        if (mProviders == null) {
             if (hasInit) {
                 initByCompiler();
             } else {
@@ -219,42 +254,7 @@ public final class Router {
             }
         } else {
             return new ErrorAction(false, "Not found the provider.");
-        }*/
-
-        if (mServiceMap == null) {
-            if (hasInit) {
-                initByCompiler();
-            } else {
-                return null;
-            }
-            if (mServiceMap == null) {
-                return null;
-            }
         }
-        return mServiceMap.get(mRequest.getProvider());
-    }
-
-    /**
-     * 寻找ActivityAction
-     *
-     * @param path 注册路径
-     */
-    ActivityAction findActivityAction(String path) {
-        if (TextUtils.isEmpty(path)) {
-            log("Activity Path is Empty!!!");
-            return null;
-        }
-
-        if (mActivityMap == null) {
-            log("No register activity!");
-            return null;
-        }
-
-        ActivityAction mAction = mActivityMap.get(path);
-        if (mAction == null) {
-            log("Activity:{" + path + "} Not found!");
-        }
-        return mAction;
     }
 
     private ScheduledExecutorService threadPool = null;
@@ -283,71 +283,9 @@ public final class Router {
             if (mAction == null) return null;
             return mAction.invoke(mRequestData, callback);
         }
+
     }
 
-    //拦截器需要单独处理
-    private HashMap<String, IInterceptor> mInterceptors;
-
-    IInterceptor getInterceptor(String key) {
-        if (mInterceptors == null) return null;
-        return mInterceptors.get(key);
-    }
-
-    /**
-     * 注册界面跳转的拦截器
-     *
-     * @param group        针对group进行拦截
-     * @param mInterceptor 拦截器
-     */
-    public void addInterceptor(String group, IInterceptor mInterceptor) {
-        if (mInterceptors == null) {
-            mInterceptors = new HashMap<>();
-        }
-        mInterceptors.put(group, mInterceptor);
-    }
-
-    private ServiceConnection multiServiceConnection;
-    private IMultiRouter mMultiRouter;
-
-    /**
-     * 为当前进程绑定广域服务，从而拿到{@link IMultiRouter}
-     */
-    public void bindMultiRouter() {
-        if (mRouterContext == null) return;
-        if (mProcessName == null) {
-            mProcessName = RouterUtil.getProcessName(mRouterContext);
-        }
-        Intent mIntent = new Intent();
-        mIntent.putExtra("process", mProcessName);
-        mIntent.setClass(mRouterContext, MultiRouterService.class);
-        if (multiServiceConnection == null) {
-            multiServiceConnection = new ServiceConnection() {
-                @Override
-                public void onServiceConnected(ComponentName name, IBinder service) {
-                    mMultiRouter = IMultiRouter.Stub.asInterface(service);
-                }
-
-                @Override
-                public void onServiceDisconnected(ComponentName name) {
-
-                }
-            };
-        }
-        mRouterContext.bindService(mIntent, multiServiceConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    /**
-     * 为当前进程解绑广域服务
-     */
-    public void unbindMultiRouter() {
-        if (null == multiServiceConnection) {
-            return;
-        }
-        mRouterContext.unbindService(multiServiceConnection);
-        mMultiRouter = null;
-    }
-
-    //组件间通信
     @NonNull
     public RouterResponse route(RouterRequest mRouterRequest) {
         if (mRouterRequest == null) {
@@ -362,35 +300,6 @@ public final class Router {
             return multiRoute(mRouterRequest);
         }
     }
-
-    /**
-     * 只在本地路由执行
-     */
-   /* @NonNull
-    public RouterResponse localRoute(RouterRequest mRouterRequest) {
-        RouterResponse mResponse = new RouterResponse();
-        Action mAction = Router.instance().findRequestAction(mRouterRequest);
-        if (mAction == null) return mResponse;
-        if (mAction.isAsync(mRouterRequest.getBundle())) {//异步
-            final LocalTask task = new LocalTask(mRouterRequest.getBundle(), mRouterRequest.getCallback(), mAction);
-            final Future f = getThreadPool().submit(task);
-            getThreadPool().schedule(new Runnable() {
-                @Override
-                public void run() {
-                    // FIXME: 2018/12/28 待检查
-                    if (f.isDone() || f.isCancelled()) return;
-                    f.cancel(true);
-                }
-            }, asyncTimeoutDelay, TimeUnit.MILLISECONDS);
-            mResponse.setMessage("本次Action是异步任务");
-        } else {//同步
-            mResponse = mAction.invoke(mRouterRequest.getBundle(), mRouterRequest.getCallback());
-        }
-        if (mResponse == null) {
-            mResponse = new RouterResponse();
-        }
-        return mResponse;
-    }*/
 
     @NonNull
     public RouterResponse localRoute(RouterRequest mRouterRequest) {
@@ -446,35 +355,65 @@ public final class Router {
             return mResponse;
         }
     }
+    //------------------------------------------------组件间通信 end--------------------------------------------------//
 
 
-    public static Observer<Object> subscribe(LifecycleOwner owner, String name, final EventCallback listener) {
+    //------------------------------------------------事件总线 begin--------------------------------------------------//
+    //订阅事件
+    public static Observer<Bundle> subscribe(LifecycleOwner owner, String name, final EventCallback listener) {
         if (TextUtils.isEmpty(name) || listener == null) {
             return null;
         }
-        Observer<Object> ob = new Observer<Object>() {
+        Observer<Bundle> ob = new Observer<Bundle>() {
             @Override
-            public void onChanged(@Nullable Object e) {
-                if (e instanceof Event) {
-                    listener.onEvent((Event) e);
-                }
+            public void onChanged(@Nullable Bundle e) {
+                listener.onEvent(e);
             }
         };
         LiveEventBus.instance().subscribe(name, owner, ob);
         return ob;
     }
 
-    public static void unsubscribe(String name, Observer<Object> observer) {
+    //退订事件
+    public static void unsubscribe(String name, Observer<Bundle> observer) {
         if (null == observer) {
             return;
         }
         LiveEventBus.instance().unsubscribe(name, observer);
     }
 
-    public static void publish(Event event) {
-        if (null == event || TextUtils.isEmpty(event.getName())) {
+    //发布事件
+    public static void publish(String key, Bundle bundle) {
+        Router.instance().multiPublish(key, bundle);
+    }
+
+    public void localPublish(String key, Bundle bundle) {
+        if (TextUtils.isEmpty(key)) {
             return;
         }
-        LiveEventBus.instance().publish(event.getName(), event);
+        LiveEventBus.instance().publish(key, bundle);
     }
+
+    private void multiPublish(String key, Bundle bundle) {
+        if (TextUtils.isEmpty(key)) return;
+        if (mRouterContext instanceof IMultiProcess) {
+            if (mMultiRouter != null) {
+                try {
+                    mMultiRouter.publish(key, bundle);
+                } catch (RemoteException mE) {
+                    mE.printStackTrace();
+                    Debugger.e(mE.getMessage());
+                }
+            } else {
+                bindMultiRouter();
+                Debugger.d("进程：(" + mProcessName + ")正在连接广域路由...");
+            }
+        } else {
+            localPublish(key, bundle);
+            Debugger.e("未启用广域路由，如需启用请让Application实现IMultiProcess接口");
+        }
+    }
+
+    //------------------------------------------------事件总线 end--------------------------------------------------//
+
 }

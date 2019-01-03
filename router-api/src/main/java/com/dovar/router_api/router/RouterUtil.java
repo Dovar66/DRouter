@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.dovar.router_api.Debugger;
 import com.dovar.router_api.multiprocess.MultiRouterRequest;
 import com.dovar.router_api.multiprocess.MultiRouterResponse;
 
@@ -39,7 +40,7 @@ public class RouterUtil {
             multiRequest.setCallback((Parcelable) callback);
         } else if (callback != null) {
             //跨进程时callback必须为Parcelable
-            Router.log("createMultiRequest: callback must implement Parcelable in MultiRouter");
+            Debugger.e("createMultiRequest: callback must implement Parcelable in MultiRouter");
         }
         return multiRequest;
     }
@@ -57,7 +58,7 @@ public class RouterUtil {
             multiResponse.setObject((Parcelable) obj);
         } else if (obj != null) {
             //跨进程时必须为Parcelable
-            Router.log("createMultiResponse: object must implement Parcelable in MultiRouter");
+            Debugger.e("createMultiResponse: object must implement Parcelable in MultiRouter");
         }
         return multiResponse;
     }

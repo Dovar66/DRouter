@@ -3,20 +3,18 @@ apply plugin: 'com.android.library'
 android {
     compileSdkVersion 27
 
-
-
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
     }
+
+    resourcePrefix "module_base_"
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-    implementation 'com.android.support:appcompat-v7:27.1.1'
 
     //路由
     api project(':router-api')

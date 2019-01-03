@@ -82,6 +82,7 @@
 
     * 使用编译时注解自动引导Module的初始化.
     * 支持跨进程调用，且不需要使用者去bindService或自定义AIDL.
+    * 支持跨进程的事件总线.
 
 ### 如何配置
 1.在BaseModule中添加依赖：
@@ -103,8 +104,6 @@
         }
 
 ### 如何使用
-
-0.注意：如果你的项目是多进程项目，需要使用多进程广域路由，那么请让你的Application添加实现 IMultiProcess 接口，广域路由默认是关闭状态，只有实现了该接口才会启用。
 
 1.在需要向外提供服务的组件中创建BaseApplicationLogic的子类，然后在其中注册Provider:
 
@@ -154,6 +153,12 @@
         然后在其他组件内使用Action:
 
         Router.instance().provider("user").action("demoAction").route();
+        
+5.多进程配置：
+
+    如果你的项目是多进程项目，需要使用多进程广域路由，那么请让你的Application添加实现 IMultiProcess 接口，广域路由默认是关闭状态，只有实现了该接口才会启用。
+
+    然后在每个进程中创建service继承ConnectMultiRouterService,并在进程初始化时调用MultiRouter.registerLocalRouter()将本地服务注册到广域路由..
 
 ### 如何使用事件总线：LiveEventBus
 
@@ -236,5 +241,7 @@ LiveEventBus.instance()
 4.支持跨APP的组件调用。
 
 5.异步调用需要设置超时。
+
+6.组件化后的git部署
 
 

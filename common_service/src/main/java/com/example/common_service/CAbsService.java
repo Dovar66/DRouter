@@ -1,6 +1,8 @@
 package com.example.common_service;
 
-public interface CAbsService {
+import com.dovar.router_api.service.IService;
+
+public interface CAbsService extends IService {
 
     void test();
 

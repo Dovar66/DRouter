@@ -6,10 +6,11 @@ package com.dovar.router_annotation;
  * @Description:
  */
 public interface RouterStr {
-    String proxyClassPackage = "com.touchtv.router";
+    String proxyClassPackage = "com.dovar.router";
     String proxyClassSimpleName = "RouterInitProxy";
-    String routerInjectorPackage = "com.touchtv.router_api.compiler";
+    String routerInjectorPackage = "com.dovar.router_api.compiler";
     String routerInjectorSimpleName = "RouterInjector";
-    String BaseApplicationLogicPackage = "com.touchtv.router_api.router";
-    String BaseApplicationLogicSimpleName = "BaseApplicationLogic";
+    String pathInjectorSimpleName="PathInjector";
+    String BaseApplicationLogicPackage = "com.dovar.router_api.router";
+    String BaseApplicationLogicSimpleName = "BaseAppInit";
 }

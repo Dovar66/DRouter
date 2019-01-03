@@ -1,9 +1,11 @@
 package com.dovar.router_api;
 
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 
 public class Debugger {
+    public static final String LOG_TAG = "Router";
 
     public interface Logger {
 
@@ -61,18 +63,21 @@ public class Debugger {
     }
 
     public static void d(String msg, Object... args) {
+        if (TextUtils.isEmpty(msg)) return;
         if (sLogger != null) {
             sLogger.d(msg, args);
         }
     }
 
     public static void i(String msg, Object... args) {
+        if (TextUtils.isEmpty(msg)) return;
         if (sLogger != null) {
             sLogger.i(msg, args);
         }
     }
 
     public static void w(String msg, Object... args) {
+        if (TextUtils.isEmpty(msg)) return;
         if (sLogger != null) {
             sLogger.w(msg, args);
         }
@@ -85,6 +90,7 @@ public class Debugger {
     }
 
     public static void e(String msg, Object... args) {
+        if (TextUtils.isEmpty(msg)) return;
         if (sLogger != null) {
             sLogger.e(msg, args);
         }
@@ -97,6 +103,7 @@ public class Debugger {
     }
 
     public static void fatal(String msg, Object... args) {
+        if (TextUtils.isEmpty(msg)) return;
         if (sLogger != null) {
             sLogger.fatal(msg, args);
         }

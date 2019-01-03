@@ -1,5 +1,7 @@
 package com.dovar.router_api.router;
 
+import com.dovar.router_api.multiprocess.Postcard;
+
 /**
  * auther by heweizong on 2018/7/20
  * description:拦截器

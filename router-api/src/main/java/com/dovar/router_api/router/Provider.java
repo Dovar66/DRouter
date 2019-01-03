@@ -16,10 +16,6 @@ public abstract class Provider {
         actions.put(key, action);
     }
 
-    //注册界面供其他module跳转
-    public void registerActivity(String key, ActivityAction action) {
-        Router.instance().registerActivity(key, action);
-    }
 
     public Action findAction(String key) {
         return actions.get(key);

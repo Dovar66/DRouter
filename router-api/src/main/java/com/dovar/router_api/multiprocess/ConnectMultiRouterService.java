@@ -2,7 +2,10 @@ package com.dovar.router_api.multiprocess;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
 
@@ -37,6 +40,11 @@ public class ConnectMultiRouterService extends Service {
                 multiResponse.setMessage(ConnectMultiRouterService.this.getClass().getSimpleName() + ":" + e.getMessage());
                 return multiResponse;
             }
+        }
+
+        @Override
+        public void publish(String key, Bundle bundle) throws RemoteException {
+            Router.instance().localPublish(key, bundle);
         }
 
         @Override
