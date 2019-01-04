@@ -1,4 +1,4 @@
-package com.dovar.router_api.eventbus;
+package com.dovar.router_api.router.eventbus;
 
 import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleOwner;
@@ -7,15 +7,10 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 
-import java.util.concurrent.TimeUnit;
-
-import android.os.Handler;
-import android.os.Looper;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-
-import com.dovar.router_api.Debugger;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -31,7 +26,7 @@ import java.util.Map;
  */
 public class LiveEventBus {
 
-    private final Map<String, BusMutableLiveData<Object>> bus;
+    private final Map<String, BusMutableLiveData<Bundle>> bus;
 
     private LiveEventBus() {
         bus = new HashMap<>();
@@ -45,26 +40,31 @@ public class LiveEventBus {
         return SingletonHolder.DEFAULT_BUS;
     }
 
-    synchronized Observable with(String key) {
+    private synchronized BusMutableLiveData<Bundle> with(String key) {
         if (!bus.containsKey(key)) {
-            bus.put(key, new BusMutableLiveData<>(key));
+            bus.put(key, new BusMutableLiveData<Bundle>(key));
         }
         return bus.get(key);
     }
 
-    public void subscribe(String key, LifecycleOwner owner, Observer observer) {
+    public void subscribe(String key, LifecycleOwner owner, Observer<Bundle> observer) {
         if (TextUtils.isEmpty(key) || owner == null || observer == null) return;
         with(key).observe(owner, observer);
     }
 
-    public void unsubscribe(String key, Observer observer) {
+    public void subscribeForever(String key, Observer<Bundle> observer) {
+        if (TextUtils.isEmpty(key) || observer == null) return;
+        with(key).observeForever(observer);
+    }
+
+    public void unsubscribe(String key, Observer<Bundle> observer) {
         if (TextUtils.isEmpty(key) || observer == null) return;
         if (bus.containsKey(key)) {
             with(key).removeObserver(observer);
         }
     }
 
-    public void publish(String key, Object obj) {
+    public void publish(String key, Bundle obj) {
         if (TextUtils.isEmpty(key)) return;
         //为了防止事件滥用，在发送事件时需要检查事件类型是否为已注册的类型，如果不是则不允许发送。
         if (bus.containsKey(key)) {
@@ -72,58 +72,14 @@ public class LiveEventBus {
         }
     }
 
-    public interface Observable<T> {
-
-        void setValue(T value);
-
-        void postValue(T value);
-
-        void postValueDelay(T value, long delay, TimeUnit unit);
-
-        void observe(@NonNull LifecycleOwner owner, @NonNull Observer<T> observer);
-
-        void observeSticky(@NonNull LifecycleOwner owner, @NonNull Observer<T> observer);
-
-        void observeForever(@NonNull Observer<T> observer);
-
-        void observeStickyForever(@NonNull Observer<T> observer);
-
-        void removeObserver(@NonNull Observer<T> observer);
-    }
-
-    private static class BusMutableLiveData<T> extends MutableLiveData<T> implements Observable<T> {
-
-        private class PostValueTask implements Runnable {
-            private Object newValue;
-
-            public PostValueTask(@NonNull Object newValue) {
-                this.newValue = newValue;
-            }
-
-            @Override
-            public void run() {
-                setValue((T) newValue);
-            }
-        }
+    private static class BusMutableLiveData<T> extends MutableLiveData<T> {
 
         @NonNull
         private final String key;
-        private Map<Observer, Observer> observerMap = new HashMap<>();
-        private Handler mainHandler = new Handler(Looper.getMainLooper());
+        private Map<Observer<T>, ObserverWrapper<T>> observerMap = new HashMap<>();
 
-
-        private BusMutableLiveData(String key) {
+        private BusMutableLiveData(@NonNull String key) {
             this.key = key;
-        }
-
-        @Override
-        public void postValue(T value) {
-            mainHandler.post(new PostValueTask(value));
-        }
-
-        @Override
-        public void postValueDelay(T value, long delay, TimeUnit unit) {
-            mainHandler.postDelayed(new PostValueTask(value), unit.convert(delay, unit));
         }
 
         @Override
@@ -152,16 +108,18 @@ public class LiveEventBus {
             hookObserverVersion(observer);
         }
 
-        public void observeSticky(@NonNull LifecycleOwner owner, @NonNull Observer<T> observer) {
-            super.observe(owner, observer);
-        }
-
         @Override
         public void observeForever(@NonNull Observer<T> observer) {
             if (!observerMap.containsKey(observer)) {
-                observerMap.put(observer, new ObserverWrapper(observer));
+                observerMap.put(observer, new ObserverWrapper<>(observer));
             }
             super.observeForever(observerMap.get(observer));
+        }
+
+        //Sticky模式
+        //支持在注册订阅者的时候设置Sticky模式，这样订阅者可以接收到订阅之前发送的消息
+        public void observeSticky(@NonNull LifecycleOwner owner, @NonNull Observer<T> observer) {
+            super.observe(owner, observer);
         }
 
         public void observeStickyForever(@NonNull Observer<T> observer) {
@@ -170,7 +128,7 @@ public class LiveEventBus {
 
         @Override
         public void removeObserver(@NonNull Observer<T> observer) {
-            Observer realObserver = null;
+            Observer<T> realObserver;
             if (observerMap.containsKey(observer)) {
                 realObserver = observerMap.remove(observer);
             } else {
@@ -296,7 +254,7 @@ public class LiveEventBus {
 
         private Observer<T> observer;
 
-        public ObserverWrapper(Observer<T> observer) {
+        ObserverWrapper(Observer<T> observer) {
             this.observer = observer;
         }
 

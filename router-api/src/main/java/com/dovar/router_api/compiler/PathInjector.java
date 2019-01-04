@@ -1,6 +1,7 @@
 package com.dovar.router_api.compiler;
 
 import android.app.Application;
+import android.support.annotation.Size;
 
 import java.util.HashMap;
 
@@ -9,5 +10,5 @@ import java.util.HashMap;
  * description:注解生成的代理类会实现此接口，谨慎修改接口内容及路径
  */
 public interface PathInjector {
-    HashMap<String, Class> init(Application app, String processName);
+    HashMap<String, Class>[] init(Application app, String processName);
 }

@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.dovar.router_annotation.Path;
-import com.dovar.router_api.eventbus.EventCallback;
+import com.dovar.router_api.router.eventbus.EventCallback;
 import com.dovar.router_api.router.Router;
 import com.example.common_service.ServiceKey;
 

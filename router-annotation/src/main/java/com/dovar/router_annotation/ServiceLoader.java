@@ -5,9 +5,10 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * @author heweizong
- * @date 2018/08/27
+ * @date 2019/01/04
  * @description:
  */
 @Retention(RetentionPolicy.CLASS)
-public @interface Router {
+public @interface ServiceLoader {
+    String key();
 }

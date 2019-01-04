@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.dovar.router_annotation.Path;
-import com.dovar.router_api.eventbus.EventCallback;
+import com.dovar.router_api.router.eventbus.EventCallback;
 import com.dovar.router_api.router.Router;
 import com.example.common_service.ServiceKey;
 
@@ -28,8 +28,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.bt_toast).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Router.instance().provider("c")
-                        .action("test")
+                Router.router("c", "test")
                         .process("com.dovar.app:c")
                         .callback(MainActivity.this)
                         .route();

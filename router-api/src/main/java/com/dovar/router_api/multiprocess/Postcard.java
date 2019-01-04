@@ -12,6 +12,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 
+import com.dovar.router_api.router.ui.UriRouter;
+
 import java.io.Serializable;
 
 /**
@@ -108,61 +110,10 @@ public final class Postcard implements Parcelable {
     }
 
     public void navigateTo(Context mContext) {
-        navigateTo(mContext, this);
+        if (null == mContext || TextUtils.isEmpty(getPath()) || getDestination() == null) return;
+        // FIXME: 2019/1/4 需要处理requestCode
+        UriRouter.instance().navigate(mContext, this, -1);
     }
-
-    private void navigateTo(final Context mContext, final Postcard mPostcard) {
-        if (null == mPostcard || null == mContext || TextUtils.isEmpty(mPostcard.getPath()) || mPostcard.getDestination() == null)
-            return;
-
-       /* final IInterceptor mInterceptor = Router.instance().getInterceptor(mPostcard.getGroup());
-        if (mInterceptor != null) {
-            mInterceptor.process(mPostcard, new InterceptorCallback() {
-                @Override
-                public void onContinue(final Postcard postcard) {
-                    if (postcard == null) return;
-                    navigation(mContext, postcard, -1);
-                }
-
-                @Override
-                public void onInterrupt(Throwable exception) {
-                    Debugger.d("Navigation failed, termination by interceptor :" + mInterceptor.getClass().getName());
-                }
-            });
-        } else {*/
-        navigation(mContext, mPostcard, -1);
-//        }
-    }
-
-    private void navigation(final Context context, final Postcard postcard, final int requestCode) {
-        final Intent intent = new Intent(context, postcard.getDestination());
-        intent.putExtras(postcard.getBundle());
-
-        // Set flags.
-        int flags = postcard.getFlags();
-        if (-1 != flags) {
-            intent.setFlags(flags);
-        } else if (!(context instanceof Activity)) {    // Non activity, need less one flag.
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        }
-
-        // Navigation in main looper.
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                if (requestCode > 0) {  // Need start for result
-                    ActivityCompat.startActivityForResult((Activity) context, intent, requestCode, postcard.getOptionsBundle());
-                } else {
-                    ActivityCompat.startActivity(context, intent, postcard.getOptionsBundle());
-                }
-
-                if ((0 != postcard.getEnterAnim() || 0 != postcard.getExitAnim()) && context instanceof Activity) {    // Old version.
-                    ((Activity) context).overridePendingTransition(postcard.getEnterAnim(), postcard.getExitAnim());
-                }
-            }
-        });
-    }
-
 
     @Override
     public int describeContents() {

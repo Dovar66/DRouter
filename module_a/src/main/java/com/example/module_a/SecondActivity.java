@@ -18,8 +18,7 @@ public class SecondActivity extends AppCompatActivity {
         findViewById(R.id.bt_toast).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Router.instance().provider("c")
-                        .action("test")
+                Router.router("c","test")
                         .process("com.dovar.app:c")
                         .callback(SecondActivity.this)
                         .route();

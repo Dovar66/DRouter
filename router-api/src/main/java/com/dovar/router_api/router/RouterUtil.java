@@ -8,10 +8,13 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.dovar.router_api.Debugger;
 import com.dovar.router_api.multiprocess.MultiRouterRequest;
 import com.dovar.router_api.multiprocess.MultiRouterResponse;
+import com.dovar.router_api.router.service.RouterRequest;
+import com.dovar.router_api.router.service.RouterResponse;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,10 +68,8 @@ public class RouterUtil {
 
     public static RouterRequest backToRequest(MultiRouterRequest mMultiRouterRequest) {
         if (mMultiRouterRequest == null) return null;
-        return RouterRequest.obtain()
+        return RouterRequest.Builder.obtain(mMultiRouterRequest.getProvider(), mMultiRouterRequest.getAction())
                 .process(mMultiRouterRequest.getProcess())
-                .provider(mMultiRouterRequest.getProvider())
-                .action(mMultiRouterRequest.getAction())
                 .callback(mMultiRouterRequest.getCallback())
                 .setBundle(mMultiRouterRequest.getBundle())
                 .build();
@@ -100,6 +101,15 @@ public class RouterUtil {
             }
         }
         return null;
+    }
+
+    public static boolean isMainProcess(Context context) {
+        String process = getProcessName(context);
+        return isMainProcess(context, process);
+    }
+
+    public static boolean isMainProcess(Context context, String process) {
+        return (!TextUtils.isEmpty(process)) && process.equals(context.getPackageName());
     }
 
     private static final String EXTRACTED_NAME_EXT = ".classes";

@@ -1,4 +1,4 @@
-package com.dovar.router_api.eventbus;
+package com.dovar.router_api.router.eventbus;
 
 import android.os.Bundle;
 

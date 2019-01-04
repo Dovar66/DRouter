@@ -1,7 +1,9 @@
 package com.dovar.router_api.router;
 
 import android.app.Application;
-import android.content.res.Configuration;
+
+import com.dovar.router_api.router.service.Provider;
+import com.dovar.router_api.router.service.ServiceLoader;
 
 public class BaseAppInit {
     protected static Application mApplication;
@@ -14,10 +16,6 @@ public class BaseAppInit {
     }
 
     public void onCreate() {
-    }
 
-    //注册provider
-    protected void registerProvider(String key, Provider mProvider) {
-        Router.instance().registerProvider(key, mProvider);
     }
 }

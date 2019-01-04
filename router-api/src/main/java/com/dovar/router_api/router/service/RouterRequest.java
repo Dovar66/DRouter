@@ -1,7 +1,9 @@
-package com.dovar.router_api.router;
+package com.dovar.router_api.router.service;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+
+import com.dovar.router_api.router.Router;
 
 import java.io.Serializable;
 
@@ -18,10 +20,6 @@ public class RouterRequest {
     private String process;//进程标识
     private Bundle mBundle;
     private Object callback;
-
-    static Builder obtain() {
-        return new Builder();
-    }
 
     public String getProcess() {
         return process;
@@ -58,24 +56,18 @@ public class RouterRequest {
         private Bundle params;
         private Object callback;
 
-        private Builder() {
-            provider = "";
-            action = "";
+        private Builder(String provider, String action) {
+            this.provider = provider;
+            this.action = action;
             params = new Bundle();
+        }
+
+        public static Builder obtain(String provider, String action) {
+            return new Builder(provider, action);
         }
 
         public Builder process(String process) {
             this.process = process;
-            return this;
-        }
-
-        public Builder provider(String providerKey) {
-            this.provider = providerKey;
-            return this;
-        }
-
-        public Builder action(String actionKey) {
-            this.action = actionKey;
             return this;
         }
 
@@ -115,7 +107,7 @@ public class RouterRequest {
             return this;
         }
 
-        Builder setBundle(Bundle mBundle) {
+        public Builder setBundle(Bundle mBundle) {
             if (mBundle == null) return this;
             this.params = mBundle;
             return this;
@@ -124,7 +116,10 @@ public class RouterRequest {
         /**
          * 修改为对外不可见，不允许外部获取RouterRequest实例
          */
-        RouterRequest build() {
+        public RouterRequest build() {
+            if (TextUtils.isEmpty(provider) || TextUtils.isEmpty(action)) {
+                throw new RuntimeException("RouterRequest: provider and action cannot be empty!");
+            }
             return new RouterRequest(this);
         }
 

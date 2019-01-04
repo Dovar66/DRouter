@@ -4,11 +4,12 @@ import android.content.Context;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.dovar.router_api.Debugger;
-import com.dovar.router_api.router.Action;
-import com.dovar.router_api.router.Provider;
-import com.dovar.router_api.router.RouterResponse;
+import com.dovar.router_annotation.ServiceLoader;
+import com.dovar.router_api.router.service.Action;
+import com.dovar.router_api.router.service.Provider;
+import com.dovar.router_api.router.service.RouterResponse;
 
+@ServiceLoader(key="c")
 public class CProvider extends Provider {
     @Override
     protected void registerActions() {

@@ -1,4 +1,4 @@
-package com.dovar.router_api.router;
+package com.dovar.router_api.router.service;
 
 import java.util.HashMap;
 
@@ -12,7 +12,7 @@ public abstract class Provider {
     }
 
     //注册Action供其他module使用
-    public void registerAction(String key, Action action) {
+    protected void registerAction(String key, Action action) {
         actions.put(key, action);
     }
 
