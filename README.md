@@ -20,8 +20,8 @@
 
 ### 3.多进程通信机制
 
-    1. 服务提供者向Router注册Action对其他进程暴露服务.
-    2. 多对多：(跨进程的多对多通信呢？)
+    1. 服务提供者向Router注册Action对其他进程暴露服务，传递的参数需要实现序列化，否则会被Router过滤掉.
+    2. 多对多：LiveEventBus.
 
 ### 4.资源文件冲突
 #### 1. AndroidManifest.xml合并：
@@ -40,7 +40,7 @@
 
     1. 防止出现同名资源，建议每个module下的资源命名都增加唯一识别字符，如module-live中的都带前缀"mlive_"，mlive_icon_close.png
 
-    2. 关于资源的拆分，一些style、常见的string、共用的图片、drawable等资源，建议存放在common module当中。对于属于不同模块的资源则应该存放在各自的module中。
+    2. 关于资源的拆分，一些style、常见的string、共用的图片、drawable等资源，建议存放在common_service当中。对于属于不同模块的资源则应该存放在各自的module中。
 
 ### 5.Module可独立运行配置
 
@@ -70,7 +70,7 @@
                   }
               }
 
-     更好的实现方式应该是这样的：设置一个可运行的壳module，如demo中的app.在壳module中根据需要配置依赖
+     更好的实现方式应该是这样的：设置一个可运行的壳module，如demo中的app.然后在壳module中配置组件依赖.
 
 ## 建议
 
@@ -234,13 +234,11 @@ LiveEventBus.instance()
 ## TODO LIST:
 1.通过编译时注解实现自动注册Provider,并要同时支持Action的主动与自动注册，自动注册的Action存放在代理类中。
 
-2.异步请求逻辑待优化。
-
-3.增加支持系统Action跳转，如拨打电话、发送短信
+3.增加支持系统Action跳转，如拨打电话、发送短信。
 
 4.支持跨APP的组件调用。
 
-5.异步调用需要设置超时。
+5.异步调用需要设置超时(待验证)。
 
 6.组件化后的git部署
 
