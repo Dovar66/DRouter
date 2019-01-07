@@ -1,0 +1,21 @@
+apply plugin: 'groovy'
+
+repositories {
+    jcenter()
+    google()
+}
+
+dependencies {
+    //build tools
+    compile 'com.android.tools.build:gradle:3.1.4'
+
+    //gradle sdk
+    compile gradleApi()
+    //groovy sdk
+    compile localGroovy()
+
+    //transform
+//    compile 'com.android.tools.build:transform-api:1.9.0'
+    //javassist,可以对字节码进行编辑
+    compile 'org.javassist:javassist:3.20.0-GA'
+}

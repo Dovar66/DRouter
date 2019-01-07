@@ -115,9 +115,11 @@ public class RouterProcessor extends AbstractProcessor {
                 ) {
             if (e.getKind() == ElementKind.CLASS) {
                 String key = e.getAnnotation(ServiceLoader.class).key();
+                ClassName className = ClassName.get((TypeElement) e);
                 if (isConcreteSubType(e, RouterStr.Provider_CLASS)) {
-                    ClassName className = ClassName.get((TypeElement) e);
                     initBuilder.addStatement("map.put(\"" + key + "\",new $T())", className);
+                } else {
+                    debug(className.getClass().getName() + "不是有效值，标注为ServiceLoader的类必须是" + RouterStr.Provider_CLASS + "的非抽象子类");
                 }
             }
         }
@@ -142,19 +144,19 @@ public class RouterProcessor extends AbstractProcessor {
     private void generateUIPathMap(Set<? extends Element> paths) {
         if (paths == null || paths.size() == 0) return;
         debug("Process Path...");
-        ClassName application = ClassName.get("android.app", "Application");
+//        ClassName application = ClassName.get("android.app", "Application");
 
         MethodSpec.Builder initBuilder = MethodSpec.methodBuilder("init")
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(application, "app")
-                .addParameter(String.class, "processName")
+//                .addParameter(application, "app")
+//                .addParameter(String.class, "processName")
                 .returns(HashMap[].class);
 
-        initBuilder.addStatement("$T process=app.getPackageName()", String.class);
+//        initBuilder.addStatement("$T process=app.getPackageName()", String.class);
         initBuilder.addStatement("$T mapActivity= new $T()", HashMap.class, HashMap.class);
         initBuilder.addStatement("$T mapInterceptor= new $T()", HashMap.class, HashMap.class);
 
-        initBuilder.beginControlFlow("if(processName!=null&&processName.equals(process))");
+//        initBuilder.beginControlFlow("if(processName!=null&&processName.equals(process))");
         for (Element e : paths
                 ) {
             if (e.getKind() == ElementKind.CLASS) {
@@ -169,21 +171,27 @@ public class RouterProcessor extends AbstractProcessor {
                             if (type instanceof Type.ClassType) {
                                 Symbol.TypeSymbol typeSymbol = ((Type.ClassType) type).asElement();
                                 if (typeSymbol instanceof Symbol.ClassSymbol) {
+                                    ClassName className = ClassName.get((TypeElement) typeSymbol);
                                     if (isConcreteSubType(typeSymbol, RouterStr.IInterceptor_CLASS)) {
-                                        ClassName className = ClassName.get((TypeElement) typeSymbol);
-                                        //or (new $T()", typeSymbol);
                                         initBuilder.addStatement("mapInterceptor.put(\"" + path + "\",$T.class)", className);
+                                    } else {
+                                        debug(className.getClass().getName() + "不是有效值，注解Path的interceptor必须是" + RouterStr.IInterceptor_CLASS + "的实现类");
                                     }
                                 }
                             }
                         }
                     }
                 }
+
                 ClassName className = ClassName.get((TypeElement) e);
-                initBuilder.addStatement("mapActivity.put(\"" + path + "\",$T.class)", className);
+                if (isConcreteSubType(e, "android.app.Activity")) {
+                    initBuilder.addStatement("mapActivity.put(\"" + path + "\",$T.class)", className);
+                } else {
+                    debug(className.getClass().getName() + "不是有效值，path必须是Activity的非抽象子类");
+                }
             }
         }
-        initBuilder.endControlFlow();
+//        initBuilder.endControlFlow();
 
         initBuilder.addStatement("$T maps={mapActivity,mapInterceptor}", HashMap[].class);
         initBuilder.addStatement("return maps");
@@ -224,8 +232,8 @@ public class RouterProcessor extends AbstractProcessor {
         MethodSpec.Builder initBuilder = MethodSpec.methodBuilder("init")
                 .addModifiers(Modifier.PUBLIC)
                 .returns(TypeName.VOID)
-                .addParameter(application, "app")
-                .addParameter(String.class, "processName");
+                .addParameter(application, "app");
+//                .addParameter(String.class, "processName");
 
         for (Element e : modules
                 ) {

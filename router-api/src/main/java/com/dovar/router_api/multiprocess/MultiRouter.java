@@ -35,6 +35,7 @@ public class MultiRouter {
         if (mApplication == null)
             throw new RuntimeException("MultiRouter Init Failed:Application cannot be null! ");
         this.mApplication = mApplication;
+        getRegisterByJavassist(mApplication);
     }
 
     static MultiRouter instance(Application mApplication) {
@@ -58,6 +59,40 @@ public class MultiRouter {
             mLocalRouterServiceMap = new HashMap<>();
         }
         mLocalRouterServiceMap.put(processName, targetClass);
+    }
+
+    private static void getRegisterByJavassist(Application app) {
+        try {
+            HashMap<String, Class> maps = (HashMap<String, Class>) getTargetService();
+            for (Map.Entry<String, Class> entry : maps.entrySet()
+                    ) {
+                registerLocalRouter(app, entry.getKey(), entry.getValue());
+            }
+        } catch (Exception e) {
+            Debugger.e(e.getMessage());
+        }
+    }
+
+    /**
+     * gradle插件会修改这个方法，插入类似如下代码:
+     * Map hashMap = new HashMap();
+     * hashMap.put(":guard", CommuStubService0.class);
+     * hashMap.put(":banana", CommuStubService1.class);
+     * hashMap.put("com.android.apple", CommuStubService2.class);
+     * hashMap.put(":test4", CommuStubService3.class);
+     * hashMap.put("com.android.test5", CommuStubService4.class);
+     * hashMap.put(":apple", CommuStubService5.class);
+     * hashMap.put(":tea", CommuStubService6.class);
+     * hashMap.put("com.android.test6", CommuStubService7.class);
+     * hashMap.put(":test3", CommuStubService8.class);
+     * hashMap.put(":test2", CommuStubService9.class);
+     * hashMap.put(":test1", CommuStubService10.class);
+     * return matchedServices;
+     */
+    //由于javassist不支持泛型，故不能返回Class,只能返回Object
+    private static Object getTargetService() {
+
+        return null;
     }
 
     void connectLocalRouter(final String process) {
@@ -136,7 +171,7 @@ public class MultiRouter {
                 e.printStackTrace();
                 Debugger.e(e.getMessage());
                 //会不会导致foreach异常
-                if (e instanceof DeadObjectException){
+                if (e instanceof DeadObjectException) {
                     mLocalRouterAIDLMap.remove(entry.getKey());
                 }
             }

@@ -5,7 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.dovar.router_annotation.Path;
-import com.dovar.router_api.router.Router;
+import com.dovar.router_api.router.DRouter;
 
 @Path(path = "/a/second")
 public class SecondActivity extends AppCompatActivity {
@@ -18,7 +18,7 @@ public class SecondActivity extends AppCompatActivity {
         findViewById(R.id.bt_toast).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Router.router("c","test")
+                DRouter.router("c","test")
                         .process("com.dovar.app:c")
                         .callback(SecondActivity.this)
                         .route();

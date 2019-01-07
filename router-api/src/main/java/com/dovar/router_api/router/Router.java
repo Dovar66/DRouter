@@ -22,15 +22,15 @@ import com.dovar.router_api.IMultiRouter;
 import com.dovar.router_api.compiler.PathInjector;
 import com.dovar.router_api.compiler.RouterInjector;
 import com.dovar.router_api.compiler.ServiceLoaderInjector;
-import com.dovar.router_api.router.eventbus.EventCallback;
-import com.dovar.router_api.router.eventbus.LiveEventBus;
 import com.dovar.router_api.multiprocess.IMultiProcess;
 import com.dovar.router_api.multiprocess.MultiRouterService;
-import com.dovar.router_api.multiprocess.Postcard;
-import com.dovar.router_api.router.ui.UriRouter;
+import com.dovar.router_api.router.ui.Postcard;
+import com.dovar.router_api.router.eventbus.EventCallback;
+import com.dovar.router_api.router.eventbus.LiveEventBus;
 import com.dovar.router_api.router.service.RouterRequest;
 import com.dovar.router_api.router.service.RouterResponse;
 import com.dovar.router_api.router.service.ServiceLoader;
+import com.dovar.router_api.router.ui.UriRouter;
 import com.dovar.router_api.utils.ServiceUtil;
 
 import java.io.IOException;
@@ -45,7 +45,6 @@ public final class Router {
     private boolean hasInit = false;
     private Application mRouterContext;
     private String mProcessName;
-
 
     private Router() {
 
@@ -69,6 +68,7 @@ public final class Router {
 
     //所有进程都应该调用init初始化路由
     public void init(Application app) {
+        if (app == null) return;
         if (!hasInit) {
             this.mRouterContext = app;
             this.mProcessName = RouterUtil.getProcessName(app);
@@ -99,10 +99,10 @@ public final class Router {
                     Object injector = proxyClass.newInstance();
                     if (injector instanceof RouterInjector) {
                         //生成组件初始化的入口
-                        ((RouterInjector) injector).init(mRouterContext, mProcessName);
+                        ((RouterInjector) injector).init(mRouterContext);
                     } else if (injector instanceof PathInjector) {
                         //注册Path，只会注册在主进程
-                        UriRouter.instance().initMaps(((PathInjector) injector).init(mRouterContext, mProcessName));
+                        UriRouter.instance().initMaps(((PathInjector) injector).init());
                     } else if (injector instanceof ServiceLoaderInjector) {
                         ServiceLoader.instance().initMap(((ServiceLoaderInjector) injector).init());
                     } else {
@@ -160,60 +160,29 @@ public final class Router {
         if (null == multiServiceConnection) {
             return;
         }
-        ServiceUtil.unbindSafely(mRouterContext,multiServiceConnection);
+        ServiceUtil.unbindSafely(mRouterContext, multiServiceConnection);
         mMultiRouter = null;
     }
 
     //------------------------------------------------界面跳转 begin--------------------------------------------------//
-    public static Postcard navigator(String path) {
-        return Router.instance().navigateTo(path);
-    }
 
-    private Postcard navigateTo(String path) {
+    /**
+     * 由于Activity的启动本来就是跨进程通信，所以不需要Router额外维护跨进程操作
+     *
+     * @param path
+     */
+    @NonNull
+    Postcard navigateTo(String path) {
         if (!hasInit) {
             throw new RuntimeException("Router尚未初始化!!!");
         }
-        if (RouterUtil.isMainProcess(mRouterContext, mProcessName)) {
-            return localNavigateTo(path);
-        } else {
-            return multiNavigateTo(path);
-        }
-    }
 
-    @NonNull
-    public Postcard localNavigateTo(String path) {
-        Postcard p = Postcard.obtain(path);
-        p.setDestination(UriRouter.instance().findActivity(path));
-        return p;
-    }
-
-    @NonNull
-    private Postcard multiNavigateTo(String path) {
-        if (mRouterContext instanceof IMultiProcess) {
-            if (mMultiRouter != null) {
-                try {
-                    return mMultiRouter.navigateTo(path);
-                } catch (RemoteException mE) {
-                    mE.printStackTrace();
-                    Debugger.e(mE.getMessage());
-                }
-            } else {
-                bindMultiRouter();
-                Debugger.d("进程：(" + mProcessName + ")正在连接广域路由...");
-            }
-        } else {
-            Debugger.e("未启用广域路由，如需启用请让Application实现IMultiProcess接口");
-        }
-        return Postcard.obtain(path);
+        return UriRouter.instance().load(path);
     }
     //------------------------------------------------界面跳转 end----------------------------------------------------//
 
 
     //------------------------------------------------组件间通信 begin--------------------------------------------------//
-    public static RouterRequest.Builder router(String provider, String action) {
-        return RouterRequest.Builder.obtain(provider, action);
-    }
-
     @NonNull
     public RouterResponse route(RouterRequest mRouterRequest) {
         if (!hasInit) {
@@ -271,7 +240,7 @@ public final class Router {
 
     //------------------------------------------------事件总线 begin--------------------------------------------------//
     //订阅事件(LifecycleOwner具有生命周期，可以不需要调用者去手动取消订阅，LifecycleOwner销毁时会自动退订)
-    public static Observer<Bundle> subscribe(LifecycleOwner owner, String name, final EventCallback listener) {
+    Observer<Bundle> subscribe(LifecycleOwner owner, String name, final EventCallback listener) {
         if (TextUtils.isEmpty(name) || listener == null) {
             return null;
         }
@@ -286,7 +255,7 @@ public final class Router {
     }
 
     //订阅事件(需要调用者去手动取消订阅)
-    public static Observer<Bundle> subscribeForever(String key, final EventCallback listener) {
+    Observer<Bundle> subscribeForever(String key, final EventCallback listener) {
         Observer<Bundle> ob = new Observer<Bundle>() {
             @Override
             public void onChanged(@Nullable Bundle e) {
@@ -298,7 +267,7 @@ public final class Router {
     }
 
     //退订事件(通过subscribeForever()订阅时,需要及时取消订阅)
-    public static void unsubscribe(String name, Observer<Bundle> observer) {
+    void unsubscribe(String name, Observer<Bundle> observer) {
         if (null == observer) {
             return;
         }
@@ -306,7 +275,10 @@ public final class Router {
     }
 
     //发布事件
-    public static void publish(String key, Bundle bundle) {
+    void publish(String key, Bundle bundle) {
+        if (!hasInit) {
+            throw new RuntimeException("Router尚未初始化!!!");
+        }
         //直接尝试发布到所有进程
         Router.instance().multiPublish(key, bundle);
     }
@@ -320,9 +292,6 @@ public final class Router {
 
     private void multiPublish(String key, Bundle bundle) {
         if (TextUtils.isEmpty(key)) return;
-        if (!hasInit) {
-            throw new RuntimeException("Router尚未初始化!!!");
-        }
         if (mRouterContext instanceof IMultiProcess) {
             if (mMultiRouter != null) {
                 try {
@@ -340,7 +309,6 @@ public final class Router {
             Debugger.d("未启用广域路由，如需启用请让Application实现IMultiProcess接口");
         }
     }
-
     //------------------------------------------------事件总线 end--------------------------------------------------//
 
 }

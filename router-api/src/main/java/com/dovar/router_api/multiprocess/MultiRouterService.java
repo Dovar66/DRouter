@@ -39,12 +39,6 @@ public class MultiRouterService extends Service {
         }
 
         @Override
-        public Postcard navigateTo(String path) throws RemoteException {
-            //由于map注册在主进程,而MultiRouter就在主进程，所以直接使用当前进程的Router
-            return Router.instance().localNavigateTo(path);
-        }
-
-        @Override
         public void publish(String key, Bundle bundle) {
             MultiRouter.instance(getApplication()).publish(key, bundle);
         }

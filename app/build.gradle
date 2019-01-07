@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: com.dovar.plugin.RouterPlugin
 
 android {
     compileSdkVersion 27
@@ -25,4 +26,5 @@ dependencies {
     implementation project(':module_a')
     implementation project(':module_b')
     implementation project(':module_c')
+//    implementation project(':buildsrc')
 }

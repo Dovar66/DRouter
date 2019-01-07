@@ -1,1 +1,1 @@
-include ':app', ':router-api', ':router-annotation', ':router-compiler', ':common_service', ':module_a', ':module_b', ':module_c', ':common_base'
+include ':app', ':router-api', ':router-annotation', ':router-compiler', ':common_service', ':module_a', ':module_b', ':module_c', ':common_base', ':buildsrc'

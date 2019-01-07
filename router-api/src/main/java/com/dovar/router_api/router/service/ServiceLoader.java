@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ServiceLoader {
 
     private final HashMap<String, Provider> mProviders;
-    private int asyncTimeoutDelay = 5000;//执行异步任务的超时时间
+    private final int asyncTimeoutDelay = 5000;//执行异步任务的超时时间
     private static AtomicInteger providerCounter = new AtomicInteger();//采用静态计数记录已注册的条目数，从路由表取用时如果发现计数不匹配则说明部分条目已被回收
 
 
@@ -58,7 +58,7 @@ public class ServiceLoader {
      *
      * @param mRequest 请求参数
      */
-    Action findRequestAction(RouterRequest mRequest) {
+    private Action findRequestAction(RouterRequest mRequest) {
         if (mProviders.size() == 0) {
             return new ErrorAction(false, "No register provider.");
         }

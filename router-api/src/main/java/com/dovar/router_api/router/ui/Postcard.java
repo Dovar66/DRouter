@@ -1,18 +1,11 @@
-package com.dovar.router_api.multiprocess;
+package com.dovar.router_api.router.ui;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-
-import com.dovar.router_api.router.ui.UriRouter;
 
 import java.io.Serializable;
 
@@ -20,7 +13,7 @@ import java.io.Serializable;
  * auther by heweizong on 2018/7/26
  * description: 用于界面跳转的通行证
  */
-public final class Postcard implements Parcelable {
+public final class Postcard {
     private String path;//跳转Activity的标识路径
     private Bundle mBundle;//跳转携带参数
     private String group;//分组，用于设置拦截器
@@ -57,7 +50,7 @@ public final class Postcard implements Parcelable {
     }
 
     @NonNull
-    public static Postcard obtain(String path) {
+    static Postcard obtain(String path) {
         Postcard card = new Postcard();
         card.path = path;
         return card;
@@ -110,48 +103,17 @@ public final class Postcard implements Parcelable {
     }
 
     public void navigateTo(Context mContext) {
-        if (null == mContext || TextUtils.isEmpty(getPath()) || getDestination() == null) return;
-        // FIXME: 2019/1/4 需要处理requestCode
+        if (null == mContext || TextUtils.isEmpty(getPath()) || null == getDestination()) return;
         UriRouter.instance().navigate(mContext, this, -1);
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public void navigateForResult(Activity mContext, int requestCode) {
+        if (null == mContext || TextUtils.isEmpty(getPath()) || null == getDestination()) return;
+        UriRouter.instance().navigate(mContext, this, requestCode);
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.path);
-        dest.writeBundle(this.mBundle);
-        dest.writeString(this.group);
-        dest.writeSerializable(this.destination);
-        dest.writeInt(this.flags);
-        dest.writeBundle(this.optionsCompat);
-        dest.writeInt(this.enterAnim);
-        dest.writeInt(this.exitAnim);
+    public void navigateForResult(Fragment mContext, int requestCode) {
+        if (null == mContext || TextUtils.isEmpty(getPath()) || null == getDestination()) return;
+        UriRouter.instance().navigate(mContext, this, requestCode);
     }
-
-    protected Postcard(Parcel in) {
-        this.path = in.readString();
-        this.mBundle = in.readBundle();
-        this.group = in.readString();
-        this.destination = (Class<?>) in.readSerializable();
-        this.flags = in.readInt();
-        this.optionsCompat = in.readBundle();
-        this.enterAnim = in.readInt();
-        this.exitAnim = in.readInt();
-    }
-
-    public static final Creator<Postcard> CREATOR = new Creator<Postcard>() {
-        @Override
-        public Postcard createFromParcel(Parcel source) {
-            return new Postcard(source);
-        }
-
-        @Override
-        public Postcard[] newArray(int size) {
-            return new Postcard[size];
-        }
-    };
 }

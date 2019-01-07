@@ -58,4 +58,49 @@ public class ConnectMultiRouterService extends Service {
             Router.instance().bindMultiRouter();
         }
     };
+
+
+    public static class ConnectMultiRouterService0 extends ConnectMultiRouterService{
+
+    }
+
+    public static class ConnectMultiRouterService1 extends ConnectMultiRouterService{
+
+    }
+
+    public static class ConnectMultiRouterService2 extends ConnectMultiRouterService{
+
+    }
+
+    public static class ConnectMultiRouterService3 extends ConnectMultiRouterService{
+
+    }
+
+    public static class ConnectMultiRouterService4 extends ConnectMultiRouterService{
+
+    }
+
+    public static class ConnectMultiRouterService5 extends ConnectMultiRouterService{
+
+    }
+
+    public static class ConnectMultiRouterService6 extends ConnectMultiRouterService{
+
+    }
+
+    public static class ConnectMultiRouterService7 extends ConnectMultiRouterService{
+
+    }
+
+    public static class ConnectMultiRouterService8 extends ConnectMultiRouterService{
+
+    }
+
+    public static class ConnectMultiRouterService9 extends ConnectMultiRouterService{
+
+    }
+
+    public static class ConnectMultiRouterService10 extends ConnectMultiRouterService{
+
+    }
 }

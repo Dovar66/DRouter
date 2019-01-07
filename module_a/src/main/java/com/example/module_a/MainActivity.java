@@ -7,8 +7,8 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.dovar.router_annotation.Path;
+import com.dovar.router_api.router.DRouter;
 import com.dovar.router_api.router.eventbus.EventCallback;
-import com.dovar.router_api.router.Router;
 import com.example.common_service.ServiceKey;
 
 @Path(path = "/a/main")
@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.tv).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Router.navigator("/c/main").navigateTo(MainActivity.this);
+                DRouter.navigator("/c/main").navigateTo(MainActivity.this);
             }
         });
 
@@ -39,18 +39,18 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 bundle.putString("content", "事件A");
-                Router.publish(ServiceKey.EVENT_A, bundle);
+                DRouter.publish(ServiceKey.EVENT_A, bundle);
             }
         });
 
-        Router.subscribe(this, ServiceKey.EVENT_B, new EventCallback() {
+        DRouter.subscribe(this, ServiceKey.EVENT_B, new EventCallback() {
             @Override
             public void onEvent(Bundle e) {
                 Toast.makeText(MainActivity.this, "/a/main/收到事件B", Toast.LENGTH_SHORT).show();
             }
         });
 
-        Router.subscribe(this, ServiceKey.EVENT_C, new EventCallback() {
+        DRouter.subscribe(this, ServiceKey.EVENT_C, new EventCallback() {
             @Override
             public void onEvent(Bundle e) {
                 Toast.makeText(MainActivity.this, "/a/main/收到事件C", Toast.LENGTH_SHORT).show();
