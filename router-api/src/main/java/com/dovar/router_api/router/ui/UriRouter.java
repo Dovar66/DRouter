@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 所有进程都应该持有界面路由表
+ * 所有进程都应该持有一份界面路由表
  * <p>
  * 界面路由表不应该只注册在主进程，否则当主进程异常销毁时，其他进程无法发生界面跳转，更无法通过界面跳转再次启动主进程
  */
@@ -25,6 +25,8 @@ public final class UriRouter {
     private final HashMap<String, Class> mInterceptors;//拦截器
     private static AtomicInteger activityCounter = new AtomicInteger();//采用静态计数记录已注册的条目数，从路由表取用时如果发现计数不匹配则说明部分条目已被回收
     private static AtomicInteger interceptorCounter = new AtomicInteger();//采用静态计数记录已设置的拦截器，从拦截器表取用时如果发现计数不匹配则说明部分条目已被回收
+
+    private final String PATH_WEBURL = "com.dovar.router_api.router.ui.UriRouter.PATH_WEB_URL";
 
     private UriRouter() {
         mActivityMap = new HashMap<>();
@@ -55,6 +57,20 @@ public final class UriRouter {
         interceptorCounter.set(mInterceptors.size());
     }
 
+    public void registerHttpActivity(Class<? extends Activity> webActivity) {
+        registerActivity(PATH_WEBURL, webActivity, null);
+    }
+
+    public void registerActivity(String path, Class<? extends Activity> mActivity, Class<? extends IInterceptor> mIInterceptor) {
+        if (TextUtils.isEmpty(path) || mActivity == null) return;
+        mActivityMap.put(path, mActivity);
+        activityCounter.set(mActivityMap.size());
+        if (mIInterceptor != null) {
+            mInterceptors.put(path, mIInterceptor);
+            interceptorCounter.set(mInterceptors.size());
+        }
+    }
+
     @NonNull
     public Postcard load(String path) {
         Postcard p = Postcard.obtain(path);
@@ -77,6 +93,9 @@ public final class UriRouter {
         Class cls = mActivityMap.get(path);
         if (cls == null) {
             Debugger.w("Activity:{" + path + "} Not found!");
+            if (isWebUrl(path)) {
+                cls = mActivityMap.get(PATH_WEBURL);
+            }
         }
         return cls;
     }
@@ -191,5 +210,9 @@ public final class UriRouter {
             return (IInterceptor) object;
         }
         return null;
+    }
+
+    private boolean isWebUrl(String url) {
+        return (!TextUtils.isEmpty(url)) && (url.toLowerCase().startsWith("http://") || url.toLowerCase().startsWith("https://"));
     }
 }
