@@ -1,6 +1,5 @@
 package com.dovar.router_api.router.service;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import com.dovar.router_api.Debugger;
@@ -8,11 +7,6 @@ import com.dovar.router_api.router.cache.Cache;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -20,8 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ServiceLoader {
 
-    private final int asyncTimeoutDelay = 5000;//执行异步任务的超时时间
-    private final HashMap<String, Provider> mProviders;
+    private final HashMap<String, Provider> mProviders;//value不允许为空
     private static AtomicInteger providerCounter = new AtomicInteger();//采用静态计数记录已注册的条目数，从路由表取用时如果发现计数不匹配则说明部分条目已被回收
 
 
@@ -96,52 +89,10 @@ public class ServiceLoader {
         RouterResponse mResponse = new RouterResponse();
         Action mAction = ServiceLoader.instance().findRequestAction(mRouterRequest);
         if (mAction == null) return mResponse;
-        if (mAction.isAsync(mRouterRequest.getBundle())) {//异步
-            final LocalTask task = new LocalTask(mRouterRequest.getBundle(), mRouterRequest.getCallback(), mAction);
-            final Future f = getThreadPool().submit(task);
-            getThreadPool().schedule(new Runnable() {
-                @Override
-                public void run() {
-                    // FIXME: 2018/12/28 待检查
-                    if (f.isDone() || f.isCancelled()) return;
-                    f.cancel(true);
-                }
-            }, asyncTimeoutDelay, TimeUnit.MILLISECONDS);
-            mResponse.setMessage("本次Action是异步任务");
-        } else {//同步
-            mResponse = mAction.invoke(mRouterRequest.getBundle(), mRouterRequest.getCallback());
-        }
+        mResponse = mAction.invoke(mRouterRequest.getBundle(), mRouterRequest.getCallback());
         if (mResponse == null) {
             mResponse = new RouterResponse();
         }
         return mResponse;
-    }
-
-
-    private ScheduledExecutorService threadPool = null;
-
-    private ScheduledExecutorService getThreadPool() {
-        if (null == threadPool) {
-            threadPool = Executors.newScheduledThreadPool(8);
-        }
-        return threadPool;
-    }
-
-    static class LocalTask implements Callable<RouterResponse> {
-        private Bundle mRequestData;
-        private Action mAction;
-        private Object callback;
-
-        LocalTask(Bundle requestData, Object callback, Action maAction) {
-            this.mRequestData = requestData;
-            this.mAction = maAction;
-            this.callback = callback;
-        }
-
-        @Override
-        public RouterResponse call() {
-            if (mAction == null) return null;
-            return mAction.invoke(mRequestData, callback);
-        }
     }
 }

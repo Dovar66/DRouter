@@ -73,7 +73,7 @@ public class Cache {
 
     private static List<String> classFileNames;
 
-    public static void initByCompiler() {
+    public static void reCreateMaps() {
         if (classFileNames == null) {
             Debugger.e("classFileNames cannot be null!");
             return;
@@ -113,7 +113,7 @@ public class Cache {
 
     public static Map<String, Class<? extends Activity>> getUIRouterMap() {
         if (activityCounter.get() != mActivityMap.size()) {
-            initByCompiler();
+            reCreateMaps();
 //        createUIRouterMap();
         }
         return mActivityMap;
@@ -121,7 +121,7 @@ public class Cache {
 
     public static Map<String, Class<? extends IInterceptor>> getInterceptorMap() {
         if (interceptorCounter.get() != mInterceptorMap.size()) {
-            initByCompiler();
+            reCreateMaps();
 //        createInterceptorMap();
         }
         return mInterceptorMap;
@@ -129,7 +129,7 @@ public class Cache {
 
     public static Map<String, Class<? extends Provider>> getProviderMap() {
         if (providerCounter.get() != mProviderMap.size()) {
-            initByCompiler();
+            reCreateMaps();
 //        createProviderMap();
         }
         return mProviderMap;

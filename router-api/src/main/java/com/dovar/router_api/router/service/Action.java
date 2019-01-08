@@ -6,8 +6,4 @@ public abstract class Action {
 
     public abstract RouterResponse invoke(Bundle requestData, Object callback);
 
-    public boolean isAsync(Bundle requestData) {
-        return false;
-    }
-
 }
