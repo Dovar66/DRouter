@@ -1,6 +1,12 @@
 package com.dovar.router_api.compiler;
 
+import android.app.Activity;
 import android.app.Application;
+
+import com.dovar.router_api.router.service.Provider;
+import com.dovar.router_api.router.ui.IInterceptor;
+
+import java.util.HashMap;
 
 /**
  * auther by heweizong on 2018/7/25
@@ -8,4 +14,10 @@ import android.app.Application;
  */
 public interface RouterInjector {
     void init(Application app);
+
+    HashMap<String, Class<? extends Activity>> createUIRouterMap();
+
+    HashMap<String, Class<? extends IInterceptor>> createInterceptorMap();
+
+    HashMap<String, Class<? extends Provider>> createProviderMap();
 }

@@ -6,13 +6,11 @@ package com.dovar.router_annotation.string;
  * @Description:
  */
 public interface RouterStr {
-    String ProxyClassPackage = "com.dovar.router";
+    String ProxyClassPackage = "com.dovar.router.generate";
     String ProxyClassSimpleName = "RouterInitProxy";
 
     String RouterInjectorPackage = "com.dovar.router_api.compiler";
     String RouterInjectorSimpleName = "RouterInjector";
-    String PathInjectorSimpleName ="PathInjector";
-    String ServiceLoaderInjectorSimpleName ="ServiceLoaderInjector";
 
     String BaseAppInitPackage = "com.dovar.router_api.router";
     String BaseAppInitSimpleName = "BaseAppInit";
