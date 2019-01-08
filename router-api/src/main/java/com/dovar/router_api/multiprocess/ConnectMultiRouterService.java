@@ -59,48 +59,89 @@ public class ConnectMultiRouterService extends Service {
         }
     };
 
-
-    public static class ConnectMultiRouterService0 extends ConnectMultiRouterService{
-
-    }
-
-    public static class ConnectMultiRouterService1 extends ConnectMultiRouterService{
+    //默认最多匹配21个进程，如果不够请自行添加
+    public static class ConnectMultiRouterService0 extends ConnectMultiRouterService {
 
     }
 
-    public static class ConnectMultiRouterService2 extends ConnectMultiRouterService{
+    public static class ConnectMultiRouterService1 extends ConnectMultiRouterService {
 
     }
 
-    public static class ConnectMultiRouterService3 extends ConnectMultiRouterService{
+    public static class ConnectMultiRouterService2 extends ConnectMultiRouterService {
 
     }
 
-    public static class ConnectMultiRouterService4 extends ConnectMultiRouterService{
+    public static class ConnectMultiRouterService3 extends ConnectMultiRouterService {
 
     }
 
-    public static class ConnectMultiRouterService5 extends ConnectMultiRouterService{
+    public static class ConnectMultiRouterService4 extends ConnectMultiRouterService {
 
     }
 
-    public static class ConnectMultiRouterService6 extends ConnectMultiRouterService{
+    public static class ConnectMultiRouterService5 extends ConnectMultiRouterService {
 
     }
 
-    public static class ConnectMultiRouterService7 extends ConnectMultiRouterService{
+    public static class ConnectMultiRouterService6 extends ConnectMultiRouterService {
 
     }
 
-    public static class ConnectMultiRouterService8 extends ConnectMultiRouterService{
+    public static class ConnectMultiRouterService7 extends ConnectMultiRouterService {
 
     }
 
-    public static class ConnectMultiRouterService9 extends ConnectMultiRouterService{
+    public static class ConnectMultiRouterService8 extends ConnectMultiRouterService {
 
     }
 
-    public static class ConnectMultiRouterService10 extends ConnectMultiRouterService{
+    public static class ConnectMultiRouterService9 extends ConnectMultiRouterService {
 
     }
+
+    public static class ConnectMultiRouterService10 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService11 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService12 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService13 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService14 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService15 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService16 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService17 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService18 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService19 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService20 extends ConnectMultiRouterService {
+
+    }
+
 }

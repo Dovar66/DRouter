@@ -11,6 +11,8 @@ import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 
 import com.dovar.router_api.Debugger;
+import com.dovar.router_api.router.ui.matcher.IMatcher;
+import com.dovar.router_api.router.ui.matcher.WebUrlMatch;
 
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -26,7 +28,7 @@ public final class UriRouter {
     private static AtomicInteger activityCounter = new AtomicInteger();//采用静态计数记录已注册的条目数，从路由表取用时如果发现计数不匹配则说明部分条目已被回收
     private static AtomicInteger interceptorCounter = new AtomicInteger();//采用静态计数记录已设置的拦截器，从拦截器表取用时如果发现计数不匹配则说明部分条目已被回收
 
-    private final String PATH_WEBURL = "com.dovar.router_api.router.ui.UriRouter.PATH_WEB_URL";
+    private final String PATH_WEB_URL = "com.dovar.router_api.router.ui.UriRouter.PATH_WEB_URL";
 
     private UriRouter() {
         mActivityMap = new HashMap<>();
@@ -58,7 +60,7 @@ public final class UriRouter {
     }
 
     public void registerHttpActivity(Class<? extends Activity> webActivity) {
-        registerActivity(PATH_WEBURL, webActivity, null);
+        registerActivity(PATH_WEB_URL, webActivity, null);
     }
 
     public void registerActivity(String path, Class<? extends Activity> mActivity, Class<? extends IInterceptor> mIInterceptor) {
@@ -74,6 +76,10 @@ public final class UriRouter {
     @NonNull
     public Postcard load(String path) {
         Postcard p = Postcard.obtain(path);
+       /* IMatcher mIMatcher=new WebUrlMatch();
+        if (mIMatcher.match(path)){
+            p.setDestination();
+        }*/
         p.setDestination(findActivity(path));
         return p;
     }
@@ -94,7 +100,7 @@ public final class UriRouter {
         if (cls == null) {
             Debugger.w("Activity:{" + path + "} Not found!");
             if (isWebUrl(path)) {
-                cls = mActivityMap.get(PATH_WEBURL);
+                cls = mActivityMap.get(PATH_WEB_URL);
             }
         }
         return cls;

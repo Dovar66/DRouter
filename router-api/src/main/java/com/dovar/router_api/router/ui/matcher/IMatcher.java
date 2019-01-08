@@ -1,4 +1,4 @@
-package com.dovar.router_api.router.ui;
+package com.dovar.router_api.router.ui.matcher;
 
 public interface IMatcher {
 

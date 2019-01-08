@@ -19,17 +19,16 @@ import android.text.TextUtils;
 import com.dovar.router_annotation.string.RouterStr;
 import com.dovar.router_api.Debugger;
 import com.dovar.router_api.IMultiRouter;
-import com.dovar.router_api.compiler.PathInjector;
 import com.dovar.router_api.compiler.RouterInjector;
-import com.dovar.router_api.compiler.ServiceLoaderInjector;
 import com.dovar.router_api.multiprocess.IMultiProcess;
 import com.dovar.router_api.multiprocess.MultiRouterService;
-import com.dovar.router_api.router.ui.Postcard;
+import com.dovar.router_api.router.cache.Cache;
 import com.dovar.router_api.router.eventbus.EventCallback;
 import com.dovar.router_api.router.eventbus.LiveEventBus;
 import com.dovar.router_api.router.service.RouterRequest;
 import com.dovar.router_api.router.service.RouterResponse;
 import com.dovar.router_api.router.service.ServiceLoader;
+import com.dovar.router_api.router.ui.Postcard;
 import com.dovar.router_api.router.ui.UriRouter;
 import com.dovar.router_api.utils.ServiceUtil;
 
@@ -98,13 +97,10 @@ public final class Router {
                     Class<?> proxyClass = Class.forName(mProxyClassFullName);
                     Object injector = proxyClass.newInstance();
                     if (injector instanceof RouterInjector) {
-                        //生成组件初始化的入口
-                        ((RouterInjector) injector).init(mRouterContext);
-                    } else if (injector instanceof PathInjector) {
-                        //注册Path，只会注册在主进程
-                        UriRouter.instance().initMaps(((PathInjector) injector).init());
-                    } else if (injector instanceof ServiceLoaderInjector) {
-                        ServiceLoader.instance().initMap(((ServiceLoaderInjector) injector).init());
+                        ((RouterInjector) injector).init(mRouterContext);//生成组件初始化的入口
+                        Cache.initUIRouterMap(((RouterInjector) injector).createUIRouterMap());
+                        Cache.initInterceptorMap(((RouterInjector) injector).createInterceptorMap());
+                        Cache.initProviderMap(((RouterInjector) injector).createProviderMap());
                     } else {
                         Debugger.d(mProxyClassFullName);
                     }
