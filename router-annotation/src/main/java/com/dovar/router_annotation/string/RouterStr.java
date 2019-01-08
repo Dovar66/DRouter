@@ -11,10 +11,11 @@ public interface RouterStr {
 
     String RouterInjectorPackage = "com.dovar.router_api.compiler";
     String RouterInjectorSimpleName = "RouterInjector";
+    String RouterMapCreatorSimpleName = "RouterMapCreator";
 
     String BaseAppInitPackage = "com.dovar.router_api.router";
     String BaseAppInitSimpleName = "BaseAppInit";
 
-    String Provider_CLASS ="com.dovar.router_api.router.service.Provider";
-    String IInterceptor_CLASS ="com.dovar.router_api.router.ui.IInterceptor";
+    String Provider_CLASS = "com.dovar.router_api.router.service.Provider";
+    String IInterceptor_CLASS = "com.dovar.router_api.router.ui.IInterceptor";
 }

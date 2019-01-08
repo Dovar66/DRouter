@@ -4,8 +4,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import com.dovar.router_api.Debugger;
+import com.dovar.router_api.router.cache.Cache;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -18,8 +20,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ServiceLoader {
 
-    private final HashMap<String, Provider> mProviders;
     private final int asyncTimeoutDelay = 5000;//执行异步任务的超时时间
+    private final HashMap<String, Provider> mProviders;
     private static AtomicInteger providerCounter = new AtomicInteger();//采用静态计数记录已注册的条目数，从路由表取用时如果发现计数不匹配则说明部分条目已被回收
 
 
@@ -35,9 +37,19 @@ public class ServiceLoader {
         private static final ServiceLoader DEFAULT = new ServiceLoader();
     }
 
-    public void initMap(HashMap<String, Provider> maps) {
-        if (maps == null) return;
-        mProviders.putAll(maps);
+    public void initProviderMap(Map<String, Class<? extends Provider>> map) {
+        if (map == null) return;
+        for (Map.Entry<String, Class<? extends Provider>> entry : map.entrySet()
+                ) {
+            try {
+                Provider p = entry.getValue().newInstance();
+                if (p != null) {
+                    mProviders.put(entry.getKey(), p);
+                }
+            } catch (InstantiationException | IllegalAccessException mE) {
+                mE.printStackTrace();
+            }
+        }
         providerCounter.set(mProviders.size());
     }
 
@@ -64,6 +76,7 @@ public class ServiceLoader {
         }
         if (providerCounter.get() != mProviders.size()) {
             Debugger.w("路由表计数异常，部分表可能已被系统回收");
+            initProviderMap(Cache.getProviderMap());
         }
         Provider provider = mProviders.get(mRequest.getProvider());
         if (provider != null) {

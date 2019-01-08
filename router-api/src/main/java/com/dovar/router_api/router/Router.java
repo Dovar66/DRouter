@@ -8,7 +8,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -16,10 +15,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.dovar.router_annotation.string.RouterStr;
 import com.dovar.router_api.Debugger;
 import com.dovar.router_api.IMultiRouter;
-import com.dovar.router_api.compiler.RouterInjector;
 import com.dovar.router_api.multiprocess.IMultiProcess;
 import com.dovar.router_api.multiprocess.MultiRouterService;
 import com.dovar.router_api.router.cache.Cache;
@@ -31,9 +28,6 @@ import com.dovar.router_api.router.service.ServiceLoader;
 import com.dovar.router_api.router.ui.Postcard;
 import com.dovar.router_api.router.ui.UriRouter;
 import com.dovar.router_api.utils.ServiceUtil;
-
-import java.io.IOException;
-import java.util.List;
 
 /**
  * 如果是多进程应用，那么每个进程都会存在一个Router对象，但{@link com.dovar.router_api.multiprocess.MultiRouter}只存在于主进程中，所有Router的跨进程操作最终都会指向MultiRouter.
@@ -71,45 +65,11 @@ public final class Router {
         if (!hasInit) {
             this.mRouterContext = app;
             this.mProcessName = RouterUtil.getProcessName(app);
-            initByCompiler();
+            Cache.initByCompiler(mRouterContext);
             if (mRouterContext instanceof IMultiProcess) {
                 bindMultiRouter();
             }
             hasInit = true;
-        }
-    }
-
-    /**
-     * 通过注解完成Module的注册
-     * 根据进程名进行相应的注册
-     */
-    private void initByCompiler() {
-        if (mRouterContext == null) return;
-        //通过注解生成的代理类的存放路径，最末位的“.”不能省略，否则会匹配到com.dovar.router_api包
-        String mProxyClassPackage = RouterStr.ProxyClassPackage + ".";
-        try {
-            List<String> classFileNames = RouterUtil.getFileNameByPackageName(mRouterContext, mProxyClassPackage);
-            for (String mProxyClassFullName : classFileNames
-                    ) {
-                //前面找到的classFileNames中可能会存在非xxxInjector子类
-                //所以在循环内捕获proxyClass.newInstance()的异常
-                try {
-                    Class<?> proxyClass = Class.forName(mProxyClassFullName);
-                    Object injector = proxyClass.newInstance();
-                    if (injector instanceof RouterInjector) {
-                        ((RouterInjector) injector).init(mRouterContext);//生成组件初始化的入口
-                        Cache.initUIRouterMap(((RouterInjector) injector).createUIRouterMap());
-                        Cache.initInterceptorMap(((RouterInjector) injector).createInterceptorMap());
-                        Cache.initProviderMap(((RouterInjector) injector).createProviderMap());
-                    } else {
-                        Debugger.d(mProxyClassFullName);
-                    }
-                } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-                    e.printStackTrace();
-                }
-            }
-        } catch (IOException | PackageManager.NameNotFoundException mE) {
-            mE.printStackTrace();
         }
     }
 

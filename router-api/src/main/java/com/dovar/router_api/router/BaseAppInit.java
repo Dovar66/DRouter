@@ -2,9 +2,6 @@ package com.dovar.router_api.router;
 
 import android.app.Application;
 
-import com.dovar.router_api.router.service.Provider;
-import com.dovar.router_api.router.service.ServiceLoader;
-
 public class BaseAppInit {
     protected static Application mApplication;
 

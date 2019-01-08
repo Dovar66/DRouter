@@ -5,7 +5,7 @@ import android.text.TextUtils;
 
 
 public class Debugger {
-    public static final String LOG_TAG = "Router";
+    public static final String LOG_TAG = "DRouter";
 
     public interface Logger {
 
