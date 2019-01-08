@@ -7,7 +7,7 @@ repositories {
 
 dependencies {
     //build tools
-    compile 'com.android.tools.build:gradle:3.1.4'
+    compile 'com.android.tools.build:gradle:3.2.1'
 
     //gradle sdk
     compile gradleApi()
