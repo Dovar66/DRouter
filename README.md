@@ -37,6 +37,10 @@
 
 ### 如何使用
 
+#### 在Application.onCreate()中完成初始化
+
+    DRouter.init(app);
+
 #### 页面路由
 
      添加Path注解,可通过interceptor设置拦截器:
@@ -60,29 +64,29 @@
     创建相应的Provider子类并添加ServiceLoader注解，然后在类中注册Action:
 
     @ServiceLoader(key = "a")
-       public class AProvider extends Provider {
-           @Override
-           protected void registerActions() {
+    public class AProvider extends Provider {
+        @Override
+        protected void registerActions() {
 
-               registerAction("test1", new Action() {
-                   @Override
-                   public RouterResponse invoke(@NonNull Bundle params, Object extra) {
-                       Toast.makeText(appContext, "弹个窗", Toast.LENGTH_SHORT).show();
-                       return null;
-                   }
-               });
+            registerAction("test1", new Action() {
+                @Override
+                public RouterResponse invoke(@NonNull Bundle params, Object extra) {
+                    Toast.makeText(appContext, "弹个窗", Toast.LENGTH_SHORT).show();
+                    return null;
+                }
+            });
 
-               registerAction("test2", new Action() {
-                    @Override
-                    public RouterResponse invoke(@NonNull Bundle params, Object extra) {
-                       if (extra instanceof Context) {
-                          Toast.makeText((Context) extra, params.getString("content"), Toast.LENGTH_SHORT).show();
-                       }
-                       return null;
+            registerAction("test2", new Action() {
+                 @Override
+                 public RouterResponse invoke(@NonNull Bundle params, Object extra) {
+                    if (extra instanceof Context) {
+                       Toast.makeText((Context) extra, params.getString("content"), Toast.LENGTH_SHORT).show();
                     }
-               });
-           }
-       }
+                    return null;
+                 }
+            });
+        }
+    }
 
     接下来就可以在项目中使用:
 
