@@ -58,7 +58,11 @@ public class Cache {
                     } else {
                         Debugger.d(mProxyClassFullName);
                     }
-                } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
                     e.printStackTrace();
                 }
             }
@@ -90,7 +94,11 @@ public class Cache {
                     initInterceptorMap(((RouterMapCreator) injector).createInterceptorMap());
                     initProviderMap(((RouterMapCreator) injector).createProviderMap());
                 }
-            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InstantiationException e) {
                 e.printStackTrace();
             }
         }

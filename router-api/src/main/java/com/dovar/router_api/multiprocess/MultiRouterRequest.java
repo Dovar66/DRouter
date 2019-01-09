@@ -12,15 +12,15 @@ public class MultiRouterRequest implements Parcelable {
     private String provider;
     private String action;
     private String process;//进程标识
-    private Bundle mBundle;
-    private Parcelable callback;
+    private Bundle params;
+    private Parcelable extra;
 
     public String getProvider() {
         return provider;
     }
 
     public void setProvider(String mProvider) {
-        provider = mProvider;
+        this.provider = mProvider;
     }
 
     public String getAction() {
@@ -28,7 +28,7 @@ public class MultiRouterRequest implements Parcelable {
     }
 
     public void setAction(String mAction) {
-        action = mAction;
+        this.action = mAction;
     }
 
     public String getProcess() {
@@ -36,23 +36,23 @@ public class MultiRouterRequest implements Parcelable {
     }
 
     public void setProcess(String mProcess) {
-        process = mProcess;
+        this.process = mProcess;
     }
 
-    public Bundle getBundle() {
-        return mBundle;
+    public Bundle getParams() {
+        return params;
     }
 
-    public void setBundle(Bundle mBundle) {
-        this.mBundle = mBundle;
+    public void setParams(Bundle mParams) {
+        this.params = mParams;
     }
 
-    public Parcelable getCallback() {
-        return callback;
+    public Parcelable getExtra() {
+        return extra;
     }
 
-    public void setCallback(Parcelable mCallback) {
-        callback = mCallback;
+    public void setExtra(Parcelable mExtra) {
+        this.extra = mExtra;
     }
 
     @Override
@@ -65,8 +65,8 @@ public class MultiRouterRequest implements Parcelable {
         dest.writeString(this.provider);
         dest.writeString(this.action);
         dest.writeString(this.process);
-        dest.writeBundle(this.mBundle);
-        dest.writeParcelable(this.callback, flags);
+        dest.writeBundle(this.params);
+        dest.writeParcelable(this.extra, flags);
     }
 
     public MultiRouterRequest() {
@@ -76,8 +76,8 @@ public class MultiRouterRequest implements Parcelable {
         this.provider = in.readString();
         this.action = in.readString();
         this.process = in.readString();
-        this.mBundle = in.readBundle();
-        this.callback = in.readParcelable(Parcelable.class.getClassLoader());
+        this.params = in.readBundle(getClass().getClassLoader());
+        this.extra = in.readParcelable(Parcelable.class.getClassLoader());
     }
 
     public static final Creator<MultiRouterRequest> CREATOR = new Creator<MultiRouterRequest>() {

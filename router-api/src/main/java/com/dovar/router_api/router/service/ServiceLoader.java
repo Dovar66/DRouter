@@ -39,7 +39,9 @@ public class ServiceLoader {
                 if (p != null) {
                     mProviders.put(entry.getKey(), p);
                 }
-            } catch (InstantiationException | IllegalAccessException mE) {
+            } catch (InstantiationException mE) {
+                mE.printStackTrace();
+            } catch (IllegalAccessException mE) {
                 mE.printStackTrace();
             }
         }
@@ -65,7 +67,7 @@ public class ServiceLoader {
      */
     private Action findRequestAction(RouterRequest mRequest) {
         if (mProviders.size() == 0) {
-            return new ErrorAction(false, "No register provider.");
+            return new ErrorAction("No register provider.");
         }
         if (providerCounter.get() != mProviders.size()) {
             Debugger.w("路由表计数异常，部分表可能已被系统回收");
@@ -77,10 +79,10 @@ public class ServiceLoader {
             if (mAction != null) {
                 return mAction;
             } else {
-                return new ErrorAction(false, "Not found the action.");
+                return new ErrorAction("Not found the action.");
             }
         } else {
-            return new ErrorAction(false, "Not found the provider.");
+            return new ErrorAction("Not found the provider.");
         }
     }
 
@@ -89,7 +91,7 @@ public class ServiceLoader {
         RouterResponse mResponse = new RouterResponse();
         Action mAction = ServiceLoader.instance().findRequestAction(mRouterRequest);
         if (mAction == null) return mResponse;
-        mResponse = mAction.invoke(mRouterRequest.getBundle(), mRouterRequest.getCallback());
+        mResponse = mAction.invoke(mRouterRequest.getParams(), mRouterRequest.getExtra());
         if (mResponse == null) {
             mResponse = new RouterResponse();
         }

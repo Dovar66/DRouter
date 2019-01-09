@@ -37,11 +37,11 @@ public class RouterUtil {
         multiRequest.setProcess(mRequest.getProcess());
         multiRequest.setProvider(mRequest.getProvider());
         multiRequest.setAction(mRequest.getAction());
-        multiRequest.setBundle(mRequest.getBundle());
-        Object callback = mRequest.getCallback();
-        if (callback instanceof Parcelable) {
-            multiRequest.setCallback((Parcelable) callback);
-        } else if (callback != null) {
+        multiRequest.setParams(mRequest.getParams());
+        Object extra = mRequest.getExtra();
+        if (extra instanceof Parcelable) {
+            multiRequest.setExtra((Parcelable) extra);
+        } else if (extra != null) {
             //跨进程时callback必须为Parcelable
             Debugger.e("createMultiRequest: callback must implement Parcelable in MultiRouter");
         }
@@ -64,15 +64,6 @@ public class RouterUtil {
             Debugger.e("createMultiResponse: object must implement Parcelable in MultiRouter");
         }
         return multiResponse;
-    }
-
-    public static RouterRequest backToRequest(MultiRouterRequest mMultiRouterRequest) {
-        if (mMultiRouterRequest == null) return null;
-        return RouterRequest.Builder.obtain(mMultiRouterRequest.getProvider(), mMultiRouterRequest.getAction())
-                .process(mMultiRouterRequest.getProcess())
-                .callback(mMultiRouterRequest.getCallback())
-                .setBundle(mMultiRouterRequest.getBundle())
-                .build();
     }
 
     @NonNull

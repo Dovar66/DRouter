@@ -15,6 +15,7 @@ import com.dovar.router_api.Debugger;
 import com.dovar.router_api.ILocalRouterAIDL;
 import com.dovar.router_api.router.Router;
 import com.dovar.router_api.router.RouterUtil;
+import com.dovar.router_api.router.service.RouterRequest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -130,7 +131,7 @@ public class MultiRouter {
         String process = routerRequest.getProcess();
         //主进程
         if (process.equals(mApplication.getPackageName())) {
-            return RouterUtil.createMultiResponse(Router.instance().localRoute(RouterUtil.backToRequest(routerRequest)));
+            return RouterUtil.createMultiResponse(Router.instance().localRoute(RouterRequest.backToRequest(routerRequest)));
         }
         //其他进程
         if (mLocalRouterAIDLMap == null) {

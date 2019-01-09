@@ -1,29 +1,21 @@
 package com.dovar.router_api.router.service;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
-public class ErrorAction extends Action {
+class ErrorAction extends Action {
     private String mMessage;
-    private boolean mAsync;
 
-    public ErrorAction() {
-        mMessage = "Something were wrong!";
-        mAsync = false;
+    private ErrorAction() {
     }
 
-    public ErrorAction(boolean isAsync, String message) {
+    ErrorAction(String message) {
         this.mMessage = message;
-        this.mAsync = isAsync;
     }
 
     @Override
-    public RouterResponse invoke(Bundle requestData, Object callback) {
+    public RouterResponse invoke(@NonNull Bundle requestData, Object callback) {
         return new RouterResponse().setMessage(mMessage);
-    }
-
-    @Override
-    public boolean isAsync(Bundle requestData) {
-        return mAsync;
     }
 
 }
