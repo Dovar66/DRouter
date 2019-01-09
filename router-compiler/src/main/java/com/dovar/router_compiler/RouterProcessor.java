@@ -134,7 +134,7 @@ public class RouterProcessor extends AbstractProcessor {
                     if (isConcreteSubType(e, RouterStr.Provider_CLASS)) {
                         createProviderMap.addStatement("map.put(\"" + key + "\",$T.class)", className);
                     } else {
-                        debug(className.getClass().getName() + "不是有效值，标注为ServiceLoader的类必须是" + RouterStr.Provider_CLASS + "的非抽象子类");
+                        debug(className.packageName() + "." + className.simpleName() + "不是有效值，标注为ServiceLoader的类必须是" + RouterStr.Provider_CLASS + "的非抽象子类");
                     }
                 }
             }
@@ -176,7 +176,10 @@ public class RouterProcessor extends AbstractProcessor {
                                         if (isConcreteSubType(typeSymbol, RouterStr.IInterceptor_CLASS)) {
                                             createInterceptorMap.addStatement("mapInterceptor.put(\"" + path + "\",$T.class)", className);
                                         } else {
-                                            debug(className.getClass().getName() + "不是有效值，注解Path的interceptor必须是" + RouterStr.IInterceptor_CLASS + "的实现类");
+                                            String entireName = className.packageName() + "." + className.simpleName();
+                                            if (!"java.lang.String".equalsIgnoreCase(entireName)) {//因为默认值为String.class，所以去掉警告
+                                                debug(entireName + "不是有效值，注解Path的interceptor必须是" + RouterStr.IInterceptor_CLASS + "的实现类");
+                                            }
                                         }
                                     }
                                 }
@@ -188,7 +191,7 @@ public class RouterProcessor extends AbstractProcessor {
                     if (isConcreteSubType(e, "android.app.Activity")) {
                         createUIRouterMap.addStatement("mapActivity.put(\"" + path + "\",$T.class)", className);
                     } else {
-                        debug(className.getClass().getName() + "不是有效值，path必须是Activity的非抽象子类");
+                        debug(className.packageName() + "." + className.simpleName() + "不是有效值，path必须是Activity的非抽象子类");
                     }
                 }
             }
