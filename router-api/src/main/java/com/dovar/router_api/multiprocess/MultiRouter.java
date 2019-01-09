@@ -5,14 +5,20 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Bundle;
+import android.os.DeadObjectException;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
+import com.dovar.router_api.Debugger;
 import com.dovar.router_api.ILocalRouterAIDL;
+import com.dovar.router_api.router.Router;
 import com.dovar.router_api.router.RouterUtil;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * auther by heweizong on 2018/8/17
@@ -30,6 +36,7 @@ public class MultiRouter {
         if (mApplication == null)
             throw new RuntimeException("MultiRouter Init Failed:Application cannot be null! ");
         this.mApplication = mApplication;
+        getRegisterByJavassist(mApplication);
     }
 
     static MultiRouter instance(Application mApplication) {
@@ -55,12 +62,47 @@ public class MultiRouter {
         mLocalRouterServiceMap.put(processName, targetClass);
     }
 
+    private static void getRegisterByJavassist(Application app) {
+        try {
+            HashMap<String, Class> maps = (HashMap<String, Class>) getTargetService();
+            for (Map.Entry<String, Class> entry : maps.entrySet()
+                    ) {
+                registerLocalRouter(app, entry.getKey(), entry.getValue());
+            }
+        } catch (Exception e) {
+            Debugger.e(e.getMessage());
+        }
+    }
+
+    /**
+     * gradle插件会修改这个方法，插入类似如下代码:
+     * Map hashMap = new HashMap();
+     * hashMap.put(":guard", CommuStubService0.class);
+     * hashMap.put(":banana", CommuStubService1.class);
+     * hashMap.put("com.android.apple", CommuStubService2.class);
+     * hashMap.put(":test4", CommuStubService3.class);
+     * hashMap.put("com.android.test5", CommuStubService4.class);
+     * hashMap.put(":apple", CommuStubService5.class);
+     * hashMap.put(":tea", CommuStubService6.class);
+     * hashMap.put("com.android.test6", CommuStubService7.class);
+     * hashMap.put(":test3", CommuStubService8.class);
+     * hashMap.put(":test2", CommuStubService9.class);
+     * hashMap.put(":test1", CommuStubService10.class);
+     * return matchedServices;
+     */
+    //由于javassist不支持泛型，故不能返回Class,只能返回Object
+    private static Object getTargetService() {
+
+        return null;
+    }
+
     void connectLocalRouter(final String process) {
         if (mApplication == null || mLocalRouterServiceMap == null) return;
         Class<? extends ConnectMultiRouterService> service = mLocalRouterServiceMap.get(process);
         if (service == null) return;
         Intent mIntent = new Intent();
         mIntent.setClass(mApplication, service);
+        Debugger.d("connectLocalRouter\t" + process);
         mApplication.bindService(mIntent, new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
@@ -74,6 +116,7 @@ public class MultiRouter {
                 //新增或更新
                 mLocalRouterAIDLMap.put(process, lrAIDL);
                 mLocalRouterConnectionMap.put(process, this);
+                Debugger.d("connectLocalRouter成功");
             }
 
             @Override
@@ -86,6 +129,17 @@ public class MultiRouter {
     @NonNull
     MultiRouterResponse route(MultiRouterRequest routerRequest) {
         String process = routerRequest.getProcess();
+        if (TextUtils.isEmpty(process)) {
+            MultiRouterResponse mResponse = new MultiRouterResponse();
+            mResponse.setMessage("MultiRouter: process is empty!");
+            Debugger.w("MultiRouter: process cannot be empty!");
+            return mResponse;
+        }
+        //主进程
+        if (process.equals(mApplication.getPackageName())) {
+            return RouterUtil.createMultiResponse(Router.instance().localRoute(RouterUtil.backToRequest(routerRequest)));
+        }
+        //其他进程
         if (mLocalRouterAIDLMap == null) {
             mLocalRouterAIDLMap = new HashMap<>();
         }
@@ -106,6 +160,28 @@ public class MultiRouter {
             MultiRouterResponse mResponse = new MultiRouterResponse();
             mResponse.setMessage("广域路由服务正在启动中...");
             return mResponse;
+        }
+    }
+
+    void publish(String key, Bundle bundle) {
+        //主进程
+        Router.instance().localPublish(key, bundle);
+        //其他进程
+        if (mLocalRouterAIDLMap == null) {
+            mLocalRouterAIDLMap = new HashMap<>();
+        }
+        for (Map.Entry<String, ILocalRouterAIDL> entry : mLocalRouterAIDLMap.entrySet()
+                ) {
+            try {
+                entry.getValue().publish(key, bundle);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+                Debugger.e(e.getMessage());
+                //会不会导致foreach异常
+                if (e instanceof DeadObjectException) {
+                    mLocalRouterAIDLMap.remove(entry.getKey());
+                }
+            }
         }
     }
 }

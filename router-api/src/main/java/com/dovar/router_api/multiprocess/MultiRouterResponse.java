@@ -10,22 +10,24 @@ import android.os.Parcelable;
 public class MultiRouterResponse implements Parcelable {
     private String mMessage = "";
 
-    private Parcelable mObject;
+    private Parcelable mData;
 
     public String getMessage() {
         return mMessage;
     }
 
-    public void setMessage(String mMessage) {
+    public MultiRouterResponse setMessage(String mMessage) {
         this.mMessage = mMessage;
+        return this;
     }
 
-    public Parcelable getObject() {
-        return mObject;
+    public Parcelable getData() {
+        return mData;
     }
 
-    public void setObject(Parcelable mObject) {
-        this.mObject = mObject;
+    public MultiRouterResponse setData(Parcelable mParcelable) {
+        this.mData = mParcelable;
+        return this;
     }
 
     @Override
@@ -36,7 +38,7 @@ public class MultiRouterResponse implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.mMessage);
-        dest.writeParcelable(this.mObject, flags);
+        dest.writeParcelable(this.mData, flags);
     }
 
     public MultiRouterResponse() {
@@ -44,7 +46,7 @@ public class MultiRouterResponse implements Parcelable {
 
     protected MultiRouterResponse(Parcel in) {
         this.mMessage = in.readString();
-        this.mObject = in.readParcelable(Parcelable.class.getClassLoader());
+        this.mData = in.readParcelable(Parcelable.class.getClassLoader());
     }
 
     public static final Creator<MultiRouterResponse> CREATOR = new Creator<MultiRouterResponse>() {

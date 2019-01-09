@@ -2,6 +2,7 @@ package com.dovar.router_api.multiprocess;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
@@ -40,6 +41,11 @@ public class ConnectMultiRouterService extends Service {
         }
 
         @Override
+        public void publish(String key, Bundle bundle) throws RemoteException {
+            Router.instance().localPublish(key, bundle);
+        }
+
+        @Override
         public boolean stopWideRouter() throws RemoteException {
             Router.instance().unbindMultiRouter();
             return true;
@@ -50,4 +56,90 @@ public class ConnectMultiRouterService extends Service {
             Router.instance().bindMultiRouter();
         }
     };
+
+    //默认最多匹配21个进程，如果不够请自行添加
+    public static class ConnectMultiRouterService0 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService1 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService2 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService3 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService4 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService5 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService6 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService7 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService8 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService9 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService10 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService11 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService12 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService13 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService14 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService15 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService16 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService17 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService18 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService19 extends ConnectMultiRouterService {
+
+    }
+
+    public static class ConnectMultiRouterService20 extends ConnectMultiRouterService {
+
+    }
+
 }

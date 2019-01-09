@@ -8,9 +8,13 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
+import com.dovar.router_api.Debugger;
 import com.dovar.router_api.multiprocess.MultiRouterRequest;
 import com.dovar.router_api.multiprocess.MultiRouterResponse;
+import com.dovar.router_api.router.service.RouterRequest;
+import com.dovar.router_api.router.service.RouterResponse;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,22 +31,6 @@ import dalvik.system.DexFile;
  * description:
  */
 public class RouterUtil {
-    public static MultiRouterRequest createMultiRequest(RouterRequest mRequest) {
-        if (mRequest == null) return null;
-        MultiRouterRequest multiRequest = new MultiRouterRequest();
-        multiRequest.setProcess(mRequest.getProcess());
-        multiRequest.setProvider(mRequest.getProvider());
-        multiRequest.setAction(mRequest.getAction());
-        multiRequest.setBundle(mRequest.getBundle());
-        Object callback = mRequest.getCallback();
-        if (callback instanceof Parcelable) {
-            multiRequest.setCallback((Parcelable) callback);
-        } else if (callback != null) {
-            //跨进程时callback必须为Parcelable
-            Router.log("createMultiRequest: callback must implement Parcelable in MultiRouter");
-        }
-        return multiRequest;
-    }
 
     @NonNull
     public static MultiRouterResponse createMultiResponse(RouterResponse mResponse) {
@@ -54,35 +42,20 @@ public class RouterUtil {
         multiResponse.setMessage(mResponse.getMessage());
         Object obj = mResponse.getData();
         if (obj instanceof Parcelable) {
-            multiResponse.setObject((Parcelable) obj);
+            multiResponse.setData((Parcelable) obj);
         } else if (obj != null) {
             //跨进程时必须为Parcelable
-            Router.log("createMultiResponse: object must implement Parcelable in MultiRouter");
+            Debugger.e("createMultiResponse: object must implement Parcelable in MultiRouter");
         }
         return multiResponse;
     }
 
     public static RouterRequest backToRequest(MultiRouterRequest mMultiRouterRequest) {
         if (mMultiRouterRequest == null) return null;
-        return RouterRequest.obtain()
-                .process(mMultiRouterRequest.getProcess())
-                .provider(mMultiRouterRequest.getProvider())
-                .action(mMultiRouterRequest.getAction())
-                .callback(mMultiRouterRequest.getCallback())
-                .setBundle(mMultiRouterRequest.getBundle())
-                .build();
-    }
-
-    @NonNull
-    public static RouterResponse backToResponse(MultiRouterResponse mMultiRouterResponse) {
-        RouterResponse mResponse = new RouterResponse();
-        if (mMultiRouterResponse == null) {
-            mResponse.setMessage("RouterUtil：参数MultiRouterResponse为空");
-            return mResponse;
-        }
-        mResponse.setMessage(mMultiRouterResponse.getMessage());
-        mResponse.setData(mMultiRouterResponse.getObject());
-        return mResponse;
+        return RouterRequest.Builder.obtain(mMultiRouterRequest.getProvider(), mMultiRouterRequest.getAction())
+                .setParams(mMultiRouterRequest.getParams())
+                .extra(mMultiRouterRequest.getExtra())
+                .buildInternal();
     }
 
 
@@ -99,6 +72,15 @@ public class RouterUtil {
             }
         }
         return null;
+    }
+
+    public static boolean isMainProcess(Context context) {
+        String process = getProcessName(context);
+        return isMainProcess(context, process);
+    }
+
+    public static boolean isMainProcess(Context context, String process) {
+        return (!TextUtils.isEmpty(process)) && process.equals(context.getPackageName());
     }
 
     private static final String EXTRACTED_NAME_EXT = ".classes";
