@@ -10,12 +10,12 @@ import android.os.DeadObjectException;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.dovar.router_api.Debugger;
 import com.dovar.router_api.ILocalRouterAIDL;
 import com.dovar.router_api.router.Router;
 import com.dovar.router_api.router.RouterUtil;
-import com.dovar.router_api.router.service.RouterRequest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -129,9 +129,15 @@ public class MultiRouter {
     @NonNull
     MultiRouterResponse route(MultiRouterRequest routerRequest) {
         String process = routerRequest.getProcess();
+        if (TextUtils.isEmpty(process)) {
+            MultiRouterResponse mResponse = new MultiRouterResponse();
+            mResponse.setMessage("MultiRouter: process is empty!");
+            Debugger.w("MultiRouter: process cannot be empty!");
+            return mResponse;
+        }
         //主进程
         if (process.equals(mApplication.getPackageName())) {
-            return RouterUtil.createMultiResponse(Router.instance().localRoute(RouterRequest.backToRequest(routerRequest)));
+            return RouterUtil.createMultiResponse(Router.instance().localRoute(RouterUtil.backToRequest(routerRequest)));
         }
         //其他进程
         if (mLocalRouterAIDLMap == null) {

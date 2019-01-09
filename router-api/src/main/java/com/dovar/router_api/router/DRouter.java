@@ -6,6 +6,7 @@ import android.arch.lifecycle.Observer;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
+import com.dovar.router_api.multiprocess.MultiRouterRequest;
 import com.dovar.router_api.router.eventbus.EventCallback;
 import com.dovar.router_api.router.service.RouterRequest;
 import com.dovar.router_api.router.ui.Postcard;
@@ -30,7 +31,13 @@ public class DRouter {
         return RouterRequest.Builder.obtain(provider, action);
     }
 
-    //发布事件
+    //跨进程的动作路由
+    @NonNull
+    public static MultiRouterRequest.Builder multiRouter(String provider, String action) {
+        return MultiRouterRequest.Builder.obtain(provider, action);
+    }
+
+    //发布事件(会发布到所有进程)
     public static void publish(String key, Bundle bundle) {
         Router.instance().publish(key, bundle);
     }

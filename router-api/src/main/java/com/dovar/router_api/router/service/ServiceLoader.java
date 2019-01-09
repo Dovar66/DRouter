@@ -89,6 +89,10 @@ public class ServiceLoader {
     @NonNull
     public RouterResponse load(RouterRequest mRouterRequest) {
         RouterResponse mResponse = new RouterResponse();
+        if (mRouterRequest == null) {
+            mResponse.setMessage("RouterRequest为空");
+            return mResponse;
+        }
         Action mAction = ServiceLoader.instance().findRequestAction(mRouterRequest);
         if (mAction == null) return mResponse;
         mResponse = mAction.invoke(mRouterRequest.getParams(), mRouterRequest.getExtra());

@@ -31,22 +31,6 @@ import dalvik.system.DexFile;
  * description:
  */
 public class RouterUtil {
-    public static MultiRouterRequest createMultiRequest(RouterRequest mRequest) {
-        if (mRequest == null) return null;
-        MultiRouterRequest multiRequest = new MultiRouterRequest();
-        multiRequest.setProcess(mRequest.getProcess());
-        multiRequest.setProvider(mRequest.getProvider());
-        multiRequest.setAction(mRequest.getAction());
-        multiRequest.setParams(mRequest.getParams());
-        Object extra = mRequest.getExtra();
-        if (extra instanceof Parcelable) {
-            multiRequest.setExtra((Parcelable) extra);
-        } else if (extra != null) {
-            //跨进程时callback必须为Parcelable
-            Debugger.e("createMultiRequest: callback must implement Parcelable in MultiRouter");
-        }
-        return multiRequest;
-    }
 
     @NonNull
     public static MultiRouterResponse createMultiResponse(RouterResponse mResponse) {
@@ -58,7 +42,7 @@ public class RouterUtil {
         multiResponse.setMessage(mResponse.getMessage());
         Object obj = mResponse.getData();
         if (obj instanceof Parcelable) {
-            multiResponse.setObject((Parcelable) obj);
+            multiResponse.setData((Parcelable) obj);
         } else if (obj != null) {
             //跨进程时必须为Parcelable
             Debugger.e("createMultiResponse: object must implement Parcelable in MultiRouter");
@@ -66,16 +50,12 @@ public class RouterUtil {
         return multiResponse;
     }
 
-    @NonNull
-    public static RouterResponse backToResponse(MultiRouterResponse mMultiRouterResponse) {
-        RouterResponse mResponse = new RouterResponse();
-        if (mMultiRouterResponse == null) {
-            mResponse.setMessage("RouterUtil：参数MultiRouterResponse为空");
-            return mResponse;
-        }
-        mResponse.setMessage(mMultiRouterResponse.getMessage());
-        mResponse.setData(mMultiRouterResponse.getObject());
-        return mResponse;
+    public static RouterRequest backToRequest(MultiRouterRequest mMultiRouterRequest) {
+        if (mMultiRouterRequest == null) return null;
+        return RouterRequest.Builder.obtain(mMultiRouterRequest.getProvider(), mMultiRouterRequest.getAction())
+                .setParams(mMultiRouterRequest.getParams())
+                .extra(mMultiRouterRequest.getExtra())
+                .buildInternal();
     }
 
 

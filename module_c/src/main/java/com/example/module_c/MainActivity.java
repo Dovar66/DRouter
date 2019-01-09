@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
                         .route();*/
                 //不跨进程
                 DRouter.router("c","test")
-                        .build()
                         .extra(MainActivity.this)
                         .route();
             }

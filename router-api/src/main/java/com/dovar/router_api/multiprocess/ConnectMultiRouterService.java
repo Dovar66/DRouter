@@ -3,16 +3,13 @@ package com.dovar.router_api.multiprocess;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
 
 import com.dovar.router_api.ILocalRouterAIDL;
 import com.dovar.router_api.router.Router;
 import com.dovar.router_api.router.RouterUtil;
-import com.dovar.router_api.router.service.RouterRequest;
 
 
 /**
@@ -34,7 +31,7 @@ public class ConnectMultiRouterService extends Service {
         @Override
         public MultiRouterResponse route(MultiRouterRequest routerRequest) throws RemoteException {
             try {
-                return RouterUtil.createMultiResponse(Router.instance().localRoute(RouterRequest.backToRequest(routerRequest)));
+                return RouterUtil.createMultiResponse(Router.instance().localRoute(RouterUtil.backToRequest(routerRequest)));
             } catch (Exception e) {
                 e.printStackTrace();
                 MultiRouterResponse multiResponse = new MultiRouterResponse();

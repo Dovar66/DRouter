@@ -18,6 +18,8 @@ import android.text.TextUtils;
 import com.dovar.router_api.Debugger;
 import com.dovar.router_api.IMultiRouter;
 import com.dovar.router_api.multiprocess.IMultiProcess;
+import com.dovar.router_api.multiprocess.MultiRouterRequest;
+import com.dovar.router_api.multiprocess.MultiRouterResponse;
 import com.dovar.router_api.multiprocess.MultiRouterService;
 import com.dovar.router_api.router.cache.Cache;
 import com.dovar.router_api.router.eventbus.EventCallback;
@@ -140,25 +142,10 @@ public final class Router {
 
     //------------------------------------------------组件间通信 begin--------------------------------------------------//
     @NonNull
-    public RouterResponse route(RouterRequest mRouterRequest) {
+    public RouterResponse localRoute(RouterRequest mRouterRequest) {
         if (!hasInit) {
             throw new RuntimeException("Router尚未初始化!!!");
         }
-        if (mRouterRequest == null) {
-            RouterResponse mResponse = new RouterResponse();
-            mResponse.setMessage("Router:参数RouterRequest为空");
-            return mResponse;
-        }
-        String process = mRouterRequest.getProcess();
-        if (TextUtils.isEmpty(process) || process.equals(mProcessName)) {//不需要跨进程
-            return localRoute(mRouterRequest);
-        } else {//多进程
-            return multiRoute(mRouterRequest);
-        }
-    }
-
-    @NonNull
-    public RouterResponse localRoute(RouterRequest mRouterRequest) {
         return ServiceLoader.instance().load(mRouterRequest);
     }
 
@@ -166,14 +153,17 @@ public final class Router {
      * 需要在广域路由执行
      */
     @NonNull
-    private RouterResponse multiRoute(RouterRequest mRouterRequest) {
-        RouterResponse mResponse = new RouterResponse();
+    public MultiRouterResponse multiRoute(MultiRouterRequest mRouterRequest) {
+        if (!hasInit) {
+            throw new RuntimeException("Router尚未初始化!!!");
+        }
+        MultiRouterResponse mResponse = new MultiRouterResponse();
         //1.检查MultiRouter是否启用
         if (mRouterContext instanceof IMultiProcess) {
             if (mMultiRouter != null) {
                 //获取MultiRouter,执行route()
                 try {
-                    return RouterUtil.backToResponse(mMultiRouter.route(RouterUtil.createMultiRequest(mRouterRequest)));
+                    return mMultiRouter.route(mRouterRequest);
                 } catch (RemoteException mE) {
                     mE.printStackTrace();
                     mResponse.setMessage(mE.getMessage());

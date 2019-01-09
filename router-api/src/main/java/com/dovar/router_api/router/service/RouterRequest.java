@@ -1,31 +1,22 @@
 package com.dovar.router_api.router.service;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.dovar.router_api.multiprocess.MultiRouterRequest;
+import com.dovar.router_api.Debugger;
 import com.dovar.router_api.router.Router;
 
 import java.io.Serializable;
 
 /**
  * router请求
- * 限制为包内可见
- * <p>
- * 期望：逻辑上对外部隐藏{@link RouterRequest}使外部对此类完全无感知。
  */
 public class RouterRequest {
     private String provider;
     private String action;
-    private String process;//进程标识
     private Bundle params;
     private Object extra;
-
-    public String getProcess() {
-        return process;
-    }
 
     public String getProvider() {
         return provider;
@@ -46,7 +37,6 @@ public class RouterRequest {
     }
 
     private RouterRequest(Builder mBuilder) {
-        this.process = mBuilder.process;
         this.provider = mBuilder.provider;
         this.action = mBuilder.action;
         this.params = mBuilder.params;
@@ -54,7 +44,6 @@ public class RouterRequest {
     }
 
     public static class Builder {
-        private String process;//进程标识
         private String provider;
         private String action;
         private Bundle params;
@@ -107,63 +96,20 @@ public class RouterRequest {
             return this;
         }
 
-        private RouterRequest buildInternal() {
+        public Builder extra(Object object) {
+            this.extra = object;
+            return this;
+        }
+
+        public RouterResponse route() {
+            return Router.instance().localRoute(buildInternal());
+        }
+
+        public RouterRequest buildInternal() {
             if (TextUtils.isEmpty(provider) || TextUtils.isEmpty(action)) {
-                throw new RuntimeException("RouterRequest: provider and action cannot be empty!");
+                Debugger.w("RouterRequest: provider and action cannot be empty!");
             }
             return new RouterRequest(this);
         }
-
-        public LocalBuilder build() {
-            return new LocalBuilder(this);
-        }
-
-        public MultiBuilder build(String mProcess) {
-            this.process = mProcess;
-            return new MultiBuilder(this);
-        }
-    }
-
-    public static class LocalBuilder {
-        private Builder mBuilder;
-
-        LocalBuilder(Builder mBuilder) {
-            this.mBuilder = mBuilder;
-        }
-
-        public LocalBuilder extra(Object object) {
-            mBuilder.extra = object;
-            return this;
-        }
-
-        public RouterResponse route() {
-            return Router.instance().route(mBuilder.buildInternal());
-        }
-    }
-
-    public static class MultiBuilder {
-        private Builder mBuilder;
-
-        MultiBuilder(Builder mBuilder) {
-            this.mBuilder = mBuilder;
-        }
-
-        public MultiBuilder extra(Parcelable parcelable) {
-            mBuilder.extra = parcelable;
-            return this;
-        }
-
-        public RouterResponse route() {
-            return Router.instance().route(mBuilder.buildInternal());
-        }
-    }
-
-    public static RouterRequest backToRequest(MultiRouterRequest mMultiRouterRequest) {
-        if (mMultiRouterRequest == null) return null;
-        return Builder.obtain(mMultiRouterRequest.getProvider(), mMultiRouterRequest.getAction())
-                .setParams(mMultiRouterRequest.getParams())
-                .build()
-                .extra(mMultiRouterRequest.getExtra())
-                .mBuilder.buildInternal();
     }
 }
