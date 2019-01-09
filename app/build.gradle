@@ -26,5 +26,4 @@ dependencies {
     implementation project(':module_a')
     implementation project(':module_b')
     implementation project(':module_c')
-//    implementation project(':buildsrc')
 }
