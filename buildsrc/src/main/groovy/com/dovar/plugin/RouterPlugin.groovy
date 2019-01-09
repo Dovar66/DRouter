@@ -17,7 +17,6 @@ class RouterPlugin implements Plugin<Project> {
         stubServiceGenerator.injectStubServiceToManifest(project)
 
         def android = project.extensions.findByType(AppExtension)
-        println("================自定义插件成功！==========")
         android.registerTransform(new RouterTransform(project,stubServiceGenerator))
         println("================自定义插件成功！==========")
     }

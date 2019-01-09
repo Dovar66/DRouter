@@ -28,16 +28,8 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.bt_toast).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               /* DRouter.router("c", "test")
-                        .process("com.dovar.app:c")
-                        .callback(MainActivity.this)
-                        .route();*/
-                //跨进程
-               /* DRouter.router("c","test")
-                        .build("com.dovar.app:c")
-                        .route();*/
                 //不跨进程
-                DRouter.router("c","test")
+                DRouter.router("c", "test")
                         .extra(MainActivity.this)
                         .route();
             }
