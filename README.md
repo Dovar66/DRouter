@@ -102,16 +102,16 @@
 ##### 订阅事件
 
     生命周期感知，不需要手动取消订阅：
-
-            DRouter.subscribe(this, ServiceKey.EVENT_A, new EventCallback() {
-                @Override
-                public void onEvent(Bundle e) {
-                    Toast.makeText(MainActivity.this, "/b/main/收到事件A", Toast.LENGTH_SHORT).show();
-                }
-            });
-
+    
+        DRouter.subscribe(this, ServiceKey.EVENT_A, new EventCallback() {
+            @Override
+            public void onEvent(Bundle e) {
+                Toast.makeText(MainActivity.this, "/b/main/收到事件A", Toast.LENGTH_SHORT).show();
+            }
+        });
+    
     需要手动取消订阅：
-
+    
         Observer<Bundle> mObserver = DRouter.subscribeForever("event_a", new EventCallback() {
             @Override
             public void onEvent(Bundle e) {
