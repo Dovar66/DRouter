@@ -6,6 +6,7 @@ import android.arch.lifecycle.Observer;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
+import com.dovar.router_api.Debugger;
 import com.dovar.router_api.multiprocess.MultiRouterRequest;
 import com.dovar.router_api.router.eventbus.EventCallback;
 import com.dovar.router_api.router.service.RouterRequest;
@@ -13,6 +14,10 @@ import com.dovar.router_api.router.ui.Postcard;
 
 
 public class DRouter {
+
+    public static synchronized void enableLog() {
+        Debugger.setEnableLog(true);
+    }
 
     //初始化，完成初始化后才能使用框架
     public static void init(Application app) {

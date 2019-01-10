@@ -1,9 +1,9 @@
 package com.example.module_b;
 
-import com.dovar.router_annotation.Router;
+import com.dovar.router_annotation.Module;
 import com.dovar.router_api.router.BaseAppInit;
 
-@Router
+@Module
 public class BInit extends BaseAppInit {
     @Override
     public void onCreate() {

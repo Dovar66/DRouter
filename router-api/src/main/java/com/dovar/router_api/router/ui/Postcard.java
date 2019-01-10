@@ -25,30 +25,6 @@ public final class Postcard {
     private int enterAnim;
     private int exitAnim;
 
-    public int getFlags() {
-        return flags;
-    }
-
-    public Bundle getOptionsBundle() {
-        return optionsCompat;
-    }
-
-    public int getEnterAnim() {
-        return enterAnim;
-    }
-
-    public int getExitAnim() {
-        return exitAnim;
-    }
-
-    public Class<?> getDestination() {
-        return destination;
-    }
-
-    public void setDestination(Class<?> destination) {
-        this.destination = destination;
-    }
-
     @NonNull
     static Postcard obtain(String path) {
         Postcard card = new Postcard();
@@ -60,20 +36,69 @@ public final class Postcard {
         mBundle = new Bundle();
     }
 
-    public Bundle getBundle() {
-        return mBundle;
-    }
 
     public String getPath() {
         return path;
     }
 
-    String getGroup() {
+    public String getGroup() {
         return group;
+    }
+
+    public int getFlags() {
+        return flags;
+    }
+
+    public int getEnterAnim() {
+        return enterAnim;
+    }
+
+    public int getExitAnim() {
+        return exitAnim;
+    }
+
+    public Bundle getOptionsBundle() {
+        return optionsCompat;
+    }
+
+    public Class<?> getDestination() {
+        return destination;
+    }
+
+    @NonNull
+    public Bundle getBundle() {
+        if (mBundle == null) {
+            mBundle = new Bundle();
+        }
+        return mBundle;
+    }
+
+    void setDestination(Class<?> destination) {
+        this.destination = destination;
     }
 
     public Postcard group(String group) {
         this.group = group;
+        return this;
+    }
+
+    public Postcard flags(int mFlags) {
+        flags = mFlags;
+        return this;
+    }
+
+    public Postcard enterAnim(int mEnterAnim) {
+        enterAnim = mEnterAnim;
+        return this;
+    }
+
+    public Postcard exitAnim(int mExitAnim) {
+        exitAnim = mExitAnim;
+        return this;
+    }
+
+    public Postcard optionsBundle(Bundle mOptionsCompat) {
+        optionsCompat = mOptionsCompat;
         return this;
     }
 
@@ -97,8 +122,14 @@ public final class Postcard {
         return this;
     }
 
-    public Postcard withObject(String key, Serializable value) {
+    public Postcard withSerializable(String key, Serializable value) {
         mBundle.putSerializable(key, value);
+        return this;
+    }
+
+    public Postcard setBundle(Bundle mBundle) {
+        if (mBundle == null) return this;
+        this.mBundle = mBundle;
         return this;
     }
 

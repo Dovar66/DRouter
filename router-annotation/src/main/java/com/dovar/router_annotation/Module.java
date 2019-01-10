@@ -9,5 +9,5 @@ import java.lang.annotation.RetentionPolicy;
  * @description:
  */
 @Retention(RetentionPolicy.CLASS)
-public @interface Router {
+public @interface Module {
 }

@@ -32,9 +32,9 @@ import com.dovar.router_api.router.ui.UriRouter;
 import com.dovar.router_api.utils.ServiceUtil;
 
 /**
- * 如果是多进程应用，那么每个进程都会存在一个Router对象，但{@link com.dovar.router_api.multiprocess.MultiRouter}只存在于主进程中，所有Router的跨进程操作最终都会指向MultiRouter.
- * Function:
- * 1.路由应该可以拦截不安全的跳转或者设定一些特定的拦截服务。
+ * 如果是多进程应用，那么每个进程都会存在一个Router对象，
+ * 但{@link com.dovar.router_api.multiprocess.MultiRouter}只存在于主进程中，
+ * 所有Router的跨进程操作最终都会指向MultiRouter.
  */
 public final class Router {
     private boolean hasInit = false;
@@ -62,7 +62,7 @@ public final class Router {
     }
 
     //所有进程都应该调用init初始化路由
-    public void init(Application app) {
+    void init(Application app) {
         if (app == null) return;
         if (!hasInit) {
             this.mRouterContext = app;
@@ -126,8 +126,6 @@ public final class Router {
 
     /**
      * 由于Activity的启动本来就是跨进程通信，所以不需要Router额外维护跨进程操作
-     *
-     * @param path
      */
     @NonNull
     Postcard navigateTo(String path) {

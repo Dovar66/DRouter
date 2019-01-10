@@ -1,7 +1,7 @@
 package com.dovar.router_compiler;
 
 import com.dovar.router_annotation.Path;
-import com.dovar.router_annotation.Router;
+import com.dovar.router_annotation.Module;
 import com.dovar.router_annotation.ServiceLoader;
 import com.dovar.router_annotation.string.RouterStr;
 import com.google.auto.service.AutoService;
@@ -51,7 +51,7 @@ public class RouterProcessor extends AbstractProcessor {
     @Override
     public Set<String> getSupportedAnnotationTypes() {
         Set<String> supportTypes = new HashSet<>();
-        supportTypes.add(Router.class.getCanonicalName());
+        supportTypes.add(Module.class.getCanonicalName());
         supportTypes.add(Path.class.getCanonicalName());
         supportTypes.add(ServiceLoader.class.getCanonicalName());
         return supportTypes;
@@ -84,7 +84,7 @@ public class RouterProcessor extends AbstractProcessor {
                     "        }\n" +
                     "    }\n" +
                     "}\n");
-            throw new RuntimeException("Router::Compiler >>> No module name, for more information, look at gradle log.");
+            throw new RuntimeException("DRouter::Compiler >>> No module name, for more information, look at gradle log.");
         }
     }
 
@@ -93,7 +93,7 @@ public class RouterProcessor extends AbstractProcessor {
         if (annotations.isEmpty()) {
             return false;
         } else {
-            Set<? extends Element> moduleList = roundEnv.getElementsAnnotatedWith(Router.class);
+            Set<? extends Element> moduleList = roundEnv.getElementsAnnotatedWith(Module.class);
             generateModuleInitMap(moduleList);
 
             TypeSpec.Builder mBuilder = TypeSpec.classBuilder(RouterStr.ProxyClassSimpleName + "$$" + moduleName + "$$RouterMapCreator")
@@ -206,7 +206,7 @@ public class RouterProcessor extends AbstractProcessor {
 
     private void generateModuleInitMap(Set<? extends Element> modules) {
         if (modules == null || modules.size() == 0) return;
-        debug("Process Router...");
+        debug("Process Module...");
         ClassName application = ClassName.get("android.app", "Application");
         ClassName baseApplicationLogic = ClassName.get(RouterStr.BaseAppInitPackage, RouterStr.BaseAppInitSimpleName);
         MethodSpec registerModule = MethodSpec.methodBuilder("registerModule")
@@ -252,30 +252,30 @@ public class RouterProcessor extends AbstractProcessor {
         }
     }
 
-    public boolean isConcreteSubType(Element element, String className) {
+    private boolean isConcreteSubType(Element element, String className) {
         return isConcreteType(element) && isSubType(element, className);
     }
 
     //check Not-ABSTRACT
-    public boolean isConcreteType(Element element) {
+    private boolean isConcreteType(Element element) {
         return element instanceof TypeElement && !element.getModifiers().contains(Modifier.ABSTRACT);
     }
 
-    public boolean isSubType(Element element, String className) {
+    private boolean isSubType(Element element, String className) {
         return element != null && isSubType(element.asType(), className);
     }
 
-    public boolean isSubType(TypeMirror type, String className) {
+    private boolean isSubType(TypeMirror type, String className) {
         return type != null && types.isSubtype(type, typeMirror(className));
     }
 
     //String --> TypeElement
-    public TypeElement typeElement(String className) {
+    private TypeElement typeElement(String className) {
         return elements.getTypeElement(className);
     }
 
     //String --> TypeMirror
-    public TypeMirror typeMirror(String className) {
+    private TypeMirror typeMirror(String className) {
         return typeElement(className).asType();
     }
 

@@ -105,9 +105,9 @@ public final class UriRouter {
         Class cls = mActivityMap.get(path);
         if (cls == null) {
             Debugger.w("Activity:{" + path + "} Not found!");
-            if (isWebUrl(path)) {
+           /* if (isWebUrl(path)) {
                 cls = mActivityMap.get(PATH_WEB_URL);
-            }
+            }*/
         }
         return cls;
     }
@@ -215,13 +215,11 @@ public final class UriRouter {
         if (cls == null) return null;
         try {
             return cls.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
         return null;
-    }
-
-    private boolean isWebUrl(String url) {
-        return (!TextUtils.isEmpty(url)) && (url.toLowerCase().startsWith("http://") || url.toLowerCase().startsWith("https://"));
     }
 }

@@ -5,7 +5,7 @@
 
 ### 框架特点
 
-    * 支持Path-Activity映射跳转的页面路由.
+    * 支持给Activity定义url，然后通过url跳转到Activity的页面路由
     * 页面路由支持添加拦截器.
     * 跨进程的事件总线.
     * 支持跨进程的API调用，且不需要使用者去bindService或自定义AIDL.
