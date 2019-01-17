@@ -8,10 +8,13 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 
 import com.dovar.router_api.Debugger;
 import com.dovar.router_api.router.cache.Cache;
+import com.dovar.router_api.router.ui.forresult.Activity4ResultUtil;
+import com.dovar.router_api.router.ui.forresult.Callback;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -112,8 +115,26 @@ public final class UriRouter {
         return cls;
     }
 
+    private IInterceptor findInterceptor(String path) {
+        if (TextUtils.isEmpty(path)) return null;
+        if (interceptorCounter.get() != mInterceptors.size()) {
+            Debugger.w("拦截器表计数异常，部分表可能已被系统回收");
+            initInterceptorMap(Cache.getInterceptorMap());
+        }
+        Class<? extends IInterceptor> cls = mInterceptors.get(path);
+        if (cls == null) return null;
+        try {
+            return cls.newInstance();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     void navigate(final Context context, final Postcard postcard, final int requestCode) {
-        final IInterceptor mInterceptor = getInterceptor(postcard.getPath());
+        final IInterceptor mInterceptor = findInterceptor(postcard.getPath());
         if (mInterceptor != null) {
             mInterceptor.process(postcard, new InterceptorCallback() {
                 @Override
@@ -162,7 +183,7 @@ public final class UriRouter {
     }
 
     void navigate(final Fragment context, final Postcard postcard, final int requestCode) {
-        final IInterceptor mInterceptor = getInterceptor(postcard.getPath());
+        final IInterceptor mInterceptor = findInterceptor(postcard.getPath());
         if (mInterceptor != null) {
             mInterceptor.process(postcard, new InterceptorCallback() {
                 @Override
@@ -204,22 +225,33 @@ public final class UriRouter {
         });
     }
 
+    void navigate(final FragmentActivity context, final Postcard postcard, final Callback mCallback) {
+        final IInterceptor mInterceptor = findInterceptor(postcard.getPath());
+        if (mInterceptor != null) {
+            mInterceptor.process(postcard, new InterceptorCallback() {
+                @Override
+                public void onContinue(final Postcard postcard) {
+                    if (postcard == null) return;
+                    navigateInternal(context, postcard, mCallback);
+                }
 
-    private IInterceptor getInterceptor(String key) {
-        if (TextUtils.isEmpty(key)) return null;
-        if (interceptorCounter.get() != mInterceptors.size()) {
-            Debugger.w("拦截器表计数异常，部分表可能已被系统回收");
-            initInterceptorMap(Cache.getInterceptorMap());
+                @Override
+                public void onInterrupt(Throwable exception) {
+                    Debugger.d("Navigation failed, termination by interceptor :" + mInterceptor.getClass().getName());
+                }
+            });
+        } else {
+            navigateInternal(context, postcard, mCallback);
         }
-        Class<? extends IInterceptor> cls = mInterceptors.get(key);
-        if (cls == null) return null;
-        try {
-            return cls.newInstance();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+    }
+
+    private void navigateInternal(final FragmentActivity context, final Postcard postcard, final Callback mCallback) {
+        final Intent intent = new Intent(context, postcard.getDestination());
+        intent.putExtras(postcard.getBundle());
+        int flags = postcard.getFlags();
+        if (-1 != flags) {
+            intent.setFlags(flags);
         }
-        return null;
+        Activity4ResultUtil.startForResult(context, intent, mCallback);
     }
 }

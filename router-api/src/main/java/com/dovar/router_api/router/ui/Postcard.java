@@ -5,7 +5,10 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
+
+import com.dovar.router_api.router.ui.forresult.Callback;
 
 import java.io.Serializable;
 
@@ -146,5 +149,9 @@ public final class Postcard {
     public void navigateForResult(Fragment mContext, int requestCode) {
         if (null == mContext || TextUtils.isEmpty(getPath()) || null == getDestination()) return;
         UriRouter.instance().navigate(mContext, this, requestCode);
+    }
+
+    public void navigateForCallback(FragmentActivity mContext, Callback mCallback) {
+        UriRouter.instance().navigate(mContext, this, mCallback);
     }
 }
