@@ -33,7 +33,25 @@
 
 3.多进程配置：
 
-    如果你的项目需要使用多进程广域路由，那么请让你的Application实现 IMultiProcess 接口，广域路由默认是关闭状态，只有实现了该接口才会启用。
+    * 如果你的项目需要使用多进程广域路由，那么请让你的Application实现 IMultiProcess 接口，广域路由默认是关闭状态，只有实现了该接口才会启用。
+
+    * 在App module的build.gradle文件中，且必须在apply plugin: 'com.android.application'之后引用编译插件RouterPlugin，具体如下：
+
+        apply plugin: 'com.android.application'
+
+        apply plugin: "com.dovar.router.plugin" //必须在apply plugin: 'com.android.application'之后，否则找不到AppExtension
+
+        buildscript {
+            repositories {
+                google()
+                maven {
+                    url "https://plugins.gradle.org/m2/"
+                }
+            }
+            dependencies {
+                classpath "gradle.plugin.RouterPlugin:plugin:1.1.6"
+            }
+        }
 
 ### 如何使用
 
