@@ -9,6 +9,5 @@ public class CInit extends BaseAppInit {
     @Override
     public void onCreate() {
         super.onCreate();
-        MultiRouter.registerLocalRouter(mApplication, "com.dovar.app:c", ConService.class);
     }
 }

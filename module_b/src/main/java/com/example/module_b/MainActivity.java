@@ -8,9 +8,10 @@ import android.widget.Toast;
 import com.dovar.router_annotation.Path;
 import com.dovar.router_api.router.DRouter;
 import com.dovar.router_api.router.eventbus.EventCallback;
+import com.example.common_service.Pages;
 import com.example.common_service.ServiceKey;
 
-@Path(path = "/b/main", interceptor = BInterceptor.class)
+@Path(path = Pages.B_MAIN, interceptor = BInterceptor.class)
 public class MainActivity extends AppCompatActivity {
 
     @Override

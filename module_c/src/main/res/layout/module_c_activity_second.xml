@@ -8,13 +8,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="c_main"/>
+        android:text="c_second"/>
 
     <Button
-        android:id="@+id/bt_event_a"
+        android:id="@+id/bt_toast"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:text="发布事件A"/>
+        android:text="跨进程弹个Toast"/>
 
 </RelativeLayout>

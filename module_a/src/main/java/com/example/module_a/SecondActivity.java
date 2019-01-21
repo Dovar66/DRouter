@@ -1,25 +1,26 @@
 package com.example.module_a;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 
 import com.dovar.router_annotation.Path;
-import com.dovar.router_api.router.DRouter;
+import com.example.common_service.Pages;
 
-@Path(path = "/a/second")
+@Path(path = Pages.A_SECOND)
 public class SecondActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.module_a_activity_second);
+    }
 
-        findViewById(R.id.bt_toast).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DRouter.multiRouter("c", "test").route("com.dovar.app:c");
-            }
-        });
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent mIntent = new Intent();
+        mIntent.putExtra("callback", "跳转回来啦");
+        setResult(RESULT_OK, mIntent);
     }
 }

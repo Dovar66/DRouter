@@ -25,5 +25,5 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/bt_jumpToSecond"
         android:layout_centerHorizontal="true"
-        android:text="发送事件A" />
+        android:text="发布事件A" />
 </RelativeLayout>

@@ -11,11 +11,4 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:text="a_second" />
-
-    <Button
-        android:id="@+id/bt_toast"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:text="跨进程弹个Toast(失败)" />
 </RelativeLayout>

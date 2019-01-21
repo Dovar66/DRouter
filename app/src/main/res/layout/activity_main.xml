@@ -1,16 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    tools:context=".DemoActivity">
 
-    <TextView
-        android:id="@+id/tv"
-        android:layout_width="wrap_content"
+    <Button
+        android:id="@+id/btn_navigator_a_second"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="app_main"
-        android:layout_centerInParent="true"/>
+        android:text="跳转到SecondActivity"/>
 
-</RelativeLayout>
+    <Button
+        android:id="@+id/btn_navigator_callback"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="跳转ForCallback"/>
+
+    <Button
+        android:id="@+id/btn_router"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="跨组件弹个Toast"/>
+
+    <Button
+        android:id="@+id/btn_multi_router"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="跨进程弹Toast"/>
+
+    <Button
+        android:id="@+id/btn_subscribe"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="订阅事件A"/>
+
+    <Button
+        android:id="@+id/btn_unsubscribe"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="退订事件A"/>
+
+    <Button
+        android:id="@+id/btn_publish"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="发布事件A"/>
+
+    <Button
+        android:id="@+id/btn_jump_publish"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="去其他进程发布事件A"/>
+</LinearLayout>

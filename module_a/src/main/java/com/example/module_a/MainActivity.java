@@ -8,10 +8,12 @@ import android.widget.Toast;
 
 import com.dovar.router_annotation.Path;
 import com.dovar.router_api.router.DRouter;
+import com.dovar.router_api.router.RouterUtil;
 import com.dovar.router_api.router.eventbus.EventCallback;
+import com.example.common_service.Pages;
 import com.example.common_service.ServiceKey;
 
-@Path(path = "/a/main")
+@Path(path = Pages.A_MAIN)
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 bundle.putString("content", "事件A");
+                bundle.putString("process", RouterUtil.getProcessName(MainActivity.this));
                 DRouter.publish(ServiceKey.EVENT_A, bundle);
             }
         });
