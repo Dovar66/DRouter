@@ -28,7 +28,7 @@ import com.dovar.router_api.router.service.RouterRequest;
 import com.dovar.router_api.router.service.RouterResponse;
 import com.dovar.router_api.router.service.ServiceLoader;
 import com.dovar.router_api.router.ui.Postcard;
-import com.dovar.router_api.router.ui.UriRouter;
+import com.dovar.router_api.router.ui.UIRouter;
 import com.dovar.router_api.utils.ServiceUtil;
 
 /**
@@ -133,7 +133,7 @@ public final class Router {
             throw new RuntimeException("Router尚未初始化!!!");
         }
 
-        return UriRouter.instance().load(path);
+        return UIRouter.instance().load(path);
     }
     //------------------------------------------------界面跳转 end----------------------------------------------------//
 

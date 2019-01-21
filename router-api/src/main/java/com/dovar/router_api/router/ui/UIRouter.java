@@ -25,25 +25,25 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <p>
  * 界面路由表不应该只注册在主进程，否则当主进程异常销毁时，其他进程无法发生界面跳转，更无法通过界面跳转再次启动主进程
  */
-public final class UriRouter {
+public final class UIRouter {
     private final HashMap<String, Class<? extends Activity>> mActivityMap;//UI路由表
     private final HashMap<String, Class<? extends IInterceptor>> mInterceptors;//拦截器
     private static AtomicInteger activityCounter = new AtomicInteger();//采用静态计数记录已注册的条目数，从路由表取用时如果发现计数不匹配则说明部分条目已被回收
     private static AtomicInteger interceptorCounter = new AtomicInteger();//采用静态计数记录已设置的拦截器，从拦截器表取用时如果发现计数不匹配则说明部分条目已被回收
 
-    private final String PATH_WEB_URL = "com.dovar.router_api.router.ui.UriRouter.PATH_WEB_URL";
+    private final String PATH_WEB_URL = "com.dovar.router_api.router.ui.UIRouter.PATH_WEB_URL";
 
-    private UriRouter() {
+    private UIRouter() {
         mActivityMap = new HashMap<>();
         mInterceptors = new HashMap<>();
     }
 
-    public static UriRouter instance() {
-        return SingletonHolder.uriRouter;
+    public static UIRouter instance() {
+        return SingletonHolder.UI_ROUTER;
     }
 
     private static class SingletonHolder {
-        private static final UriRouter uriRouter = new UriRouter();
+        private static final UIRouter UI_ROUTER = new UIRouter();
     }
 
     /**

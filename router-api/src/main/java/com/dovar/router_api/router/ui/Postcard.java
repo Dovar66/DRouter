@@ -138,20 +138,20 @@ public final class Postcard {
 
     public void navigateTo(Context mContext) {
         if (null == mContext || TextUtils.isEmpty(getPath()) || null == getDestination()) return;
-        UriRouter.instance().navigate(mContext, this, -1);
+        UIRouter.instance().navigate(mContext, this, -1);
     }
 
     public void navigateForResult(Activity mContext, int requestCode) {
         if (null == mContext || TextUtils.isEmpty(getPath()) || null == getDestination()) return;
-        UriRouter.instance().navigate(mContext, this, requestCode);
+        UIRouter.instance().navigate(mContext, this, requestCode);
     }
 
     public void navigateForResult(Fragment mContext, int requestCode) {
         if (null == mContext || TextUtils.isEmpty(getPath()) || null == getDestination()) return;
-        UriRouter.instance().navigate(mContext, this, requestCode);
+        UIRouter.instance().navigate(mContext, this, requestCode);
     }
 
     public void navigateForCallback(FragmentActivity mContext, Callback mCallback) {
-        UriRouter.instance().navigate(mContext, this, mCallback);
+        UIRouter.instance().navigate(mContext, this, mCallback);
     }
 }

@@ -12,7 +12,7 @@ import com.dovar.router_api.router.RouterUtil;
 import com.dovar.router_api.router.service.Provider;
 import com.dovar.router_api.router.service.ServiceLoader;
 import com.dovar.router_api.router.ui.IInterceptor;
-import com.dovar.router_api.router.ui.UriRouter;
+import com.dovar.router_api.router.ui.UIRouter;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -70,8 +70,8 @@ public class Cache {
             mE.printStackTrace();
         }
 
-        UriRouter.instance().initActivityMap(mActivityMap);
-        UriRouter.instance().initInterceptorMap(mInterceptorMap);
+        UIRouter.instance().initActivityMap(mActivityMap);
+        UIRouter.instance().initInterceptorMap(mInterceptorMap);
         ServiceLoader.instance().initProviderMap(mProviderMap);
     }
 
