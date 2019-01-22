@@ -3,6 +3,7 @@ package com.example.module_c;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dovar.router_annotation.Path;
@@ -19,6 +20,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.module_c_activity_main);
+
+        TextView tv_info = findViewById(R.id.tv_info);
+        tv_info.setText("当前页面：MainActivity\n当前组件：module_c\n当前进程：" + RouterUtil.getProcessName(this));
 
         findViewById(R.id.bt_event_a).setOnClickListener(new View.OnClickListener() {
             @Override

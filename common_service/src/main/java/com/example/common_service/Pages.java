@@ -1,6 +1,8 @@
 package com.example.common_service;
 
 public interface Pages {
+    //app
+    String APP_MAIN = "/app/main";
     //module_a
     String A_MAIN = "/a/main";
     String A_SECOND = "/a/second";

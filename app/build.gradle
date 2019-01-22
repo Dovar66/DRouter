@@ -3,7 +3,7 @@ apply plugin: "com.dovar.router.plugin" //必须在apply plugin: 'com.android.ap
 
 buildscript {
     repositories {
-        google() //3.0以上的build tool版本需要添加google()
+        google()
         maven {
             url "https://plugins.gradle.org/m2/"
         }

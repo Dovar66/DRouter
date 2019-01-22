@@ -3,7 +3,9 @@
     package="com.example.module_b">
 
     <application>
-        <activity android:name=".MainActivity"></activity>
+        <activity
+            android:name=".MainActivity"
+            android:process=":c"></activity>
     </application>
 
 </manifest>

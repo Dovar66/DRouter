@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.example.module_c">
+    package="com.example.module_c">
 
     <application>
         <activity
             android:name=".MainActivity"
-            android:process=":c"/>
-        <activity android:name=".SecondActivity">
-        </activity>
+            android:process=":cm" />
+        <activity
+            android:name=".SecondActivity"
+            android:process=":cs"></activity>
     </application>
 
 </manifest>

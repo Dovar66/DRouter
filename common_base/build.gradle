@@ -14,6 +14,9 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    //Toast
+    implementation 'com.github.Dovar66:DToast:1.1.2'
+
     //路由
     api project(':router-api')
 }

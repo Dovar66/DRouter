@@ -15,7 +15,7 @@ import com.dovar.router_api.router.ui.Postcard;
 
 public class DRouter {
 
-    public static synchronized void enableLog() {
+    public static void enableLog() {
         Debugger.setEnableLog(true);
     }
 

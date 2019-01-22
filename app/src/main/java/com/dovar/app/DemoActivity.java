@@ -5,27 +5,31 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.dovar.router_annotation.Path;
 import com.dovar.router_api.router.DRouter;
 import com.dovar.router_api.router.RouterUtil;
 import com.dovar.router_api.router.eventbus.EventCallback;
 import com.dovar.router_api.router.ui.forresult.Callback;
+import com.example.common_base.ToastUtil;
 import com.example.common_service.Actions;
 import com.example.common_service.Pages;
-import com.example.common_service.ProcessName;
 import com.example.common_service.Providers;
 import com.example.common_service.ServiceKey;
 
-@Path(path = "/main")
+@Path(path = Pages.APP_MAIN)
 public class DemoActivity extends AppCompatActivity {
+
     private Observer<Bundle> mObserver_a;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        TextView tv_info = findViewById(R.id.tv_info);
+        tv_info.setText("当前组件：app\n当前进程：" + RouterUtil.getProcessName(this));
 
         addViewClickEvent(R.id.btn_navigator_a_second, new View.OnClickListener() {
             @Override
@@ -43,7 +47,7 @@ public class DemoActivity extends AppCompatActivity {
                         if (data != null) {
                             s = data.getStringExtra("callback");
                         }
-                        Toast.makeText(DemoActivity.this, "navigateForCallback:" + s, Toast.LENGTH_SHORT).show();
+                        ToastUtil.show(DemoActivity.this, "navigateForCallback:" + s);
                     }
                 });
             }
@@ -69,17 +73,17 @@ public class DemoActivity extends AppCompatActivity {
                     @Override
                     public void onEvent(Bundle e) {
                         String process = e.getString("process");
-                        Toast.makeText(DemoActivity.this, "收到" + e.getString("content" + ":" + process), Toast.LENGTH_SHORT).show();
+                        ToastUtil.show(DemoActivity.this, "收到" + process + "发出的" + e.getString("content"));
                     }
                 });
-                Toast.makeText(DemoActivity.this, "订阅事件A", Toast.LENGTH_SHORT).show();
+                ToastUtil.show(DemoActivity.this, "订阅事件A");
             }
         });
         addViewClickEvent(R.id.btn_unsubscribe, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DRouter.unsubscribe(ServiceKey.EVENT_A, mObserver_a);
-                Toast.makeText(DemoActivity.this, "退订事件A", Toast.LENGTH_SHORT).show();
+                ToastUtil.show(DemoActivity.this, "退订事件A");
             }
         });
         addViewClickEvent(R.id.btn_publish, new View.OnClickListener() {

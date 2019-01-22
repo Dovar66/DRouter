@@ -3,6 +3,7 @@ package com.example.module_c;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import com.dovar.router_annotation.Path;
 import com.dovar.router_api.router.DRouter;
@@ -19,6 +20,9 @@ public class SecondActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.module_c_activity_second);
+
+        TextView tv_info = findViewById(R.id.tv_info);
+        tv_info.setText("当前页面：SecondActivity\n当前组件：module_c\n当前进程：" + RouterUtil.getProcessName(this));
 
         findViewById(R.id.bt_toast).setOnClickListener(new View.OnClickListener() {
             @Override

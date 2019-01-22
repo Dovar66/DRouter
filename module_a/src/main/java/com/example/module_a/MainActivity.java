@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dovar.router_annotation.Path;
@@ -21,12 +22,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.module_a_activity_main);
 
-        findViewById(R.id.tv).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DRouter.navigator("/c/main").navigateTo(MainActivity.this);
-            }
-        });
+        TextView tv_info = findViewById(R.id.tv_info);
+        tv_info.setText("当前页面：MainActivity\n当前组件：module_a\n当前进程：" + RouterUtil.getProcessName(this));
 
         findViewById(R.id.bt_jumpToSecond).setOnClickListener(new View.OnClickListener() {
             @Override
