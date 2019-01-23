@@ -3,10 +3,9 @@ package com.dovar.router_api.multiprocess;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.dovar.router_api.Debugger;
+import com.dovar.router_api.utils.Debugger;
 import com.dovar.router_api.router.Router;
 
 import java.io.Serializable;

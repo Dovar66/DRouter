@@ -10,7 +10,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.dovar.router_api.Debugger;
+import com.dovar.router_api.utils.Debugger;
 import com.dovar.router_api.multiprocess.MultiRouterRequest;
 import com.dovar.router_api.multiprocess.MultiRouterResponse;
 import com.dovar.router_api.router.service.RouterRequest;

@@ -12,7 +12,7 @@ import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.dovar.router_api.Debugger;
+import com.dovar.router_api.utils.Debugger;
 import com.dovar.router_api.ILocalRouterAIDL;
 import com.dovar.router_api.router.Router;
 import com.dovar.router_api.router.RouterUtil;

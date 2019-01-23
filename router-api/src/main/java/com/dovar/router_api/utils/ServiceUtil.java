@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 
-import com.dovar.router_api.Debugger;
-
 public class ServiceUtil {
     /**
      * 考虑到Android 8.0在后台调用startService时会抛出IllegalStateException

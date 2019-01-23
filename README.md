@@ -15,11 +15,11 @@
 ### 如何配置
 1.在BaseModule中添加依赖：
 
-    api 'com.github.Dovar66.DRouter:router-api:0.0.8'
+    api 'com.github.Dovar66.DRouter:router-api:1.0.0'
 
 2.在其他需要用到DRouter的组件中添加注解处理器的依赖：
 
-    annotationProcessor 'com.github.Dovar66.DRouter:router-compiler:0.0.8'
+    annotationProcessor 'com.github.Dovar66.DRouter:router-compiler:1.0.0'
 
     同时在这些组件的defaultConfig中配置注解参数，指定唯一的组件名：
 
@@ -49,7 +49,7 @@
                 }
             }
             dependencies {
-                classpath "gradle.plugin.RouterPlugin:plugin:1.1.6"
+                classpath "gradle.plugin.RouterPlugin:plugin:1.1.8"
             }
         }
 

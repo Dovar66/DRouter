@@ -11,7 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 
-import com.dovar.router_api.Debugger;
+import com.dovar.router_api.utils.Debugger;
 import com.dovar.router_api.router.cache.Cache;
 import com.dovar.router_api.router.ui.forresult.Activity4ResultUtil;
 import com.dovar.router_api.router.ui.forresult.Callback;

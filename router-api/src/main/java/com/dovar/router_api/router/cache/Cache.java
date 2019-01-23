@@ -5,7 +5,7 @@ import android.app.Application;
 import android.content.pm.PackageManager;
 
 import com.dovar.router_annotation.string.RouterStr;
-import com.dovar.router_api.Debugger;
+import com.dovar.router_api.utils.Debugger;
 import com.dovar.router_api.compiler.RouterInjector;
 import com.dovar.router_api.compiler.RouterMapCreator;
 import com.dovar.router_api.router.RouterUtil;

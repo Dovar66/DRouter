@@ -2,7 +2,7 @@ package com.dovar.router_api.router.service;
 
 import android.support.annotation.NonNull;
 
-import com.dovar.router_api.Debugger;
+import com.dovar.router_api.utils.Debugger;
 import com.dovar.router_api.router.cache.Cache;
 
 import java.util.HashMap;
