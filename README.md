@@ -199,7 +199,7 @@
 ### 遇到问题怎么办？
 
     * 打开DRouter日志开关，通过调用日志辅助分析.
-    * 查阅Wiki了解DRouter的实现原理.
+    * 查阅[Wiki](https://github.com/Dovar66/DRouter/blob/master/wiki.md)了解DRouter的实现原理.
     * 查看issue中其它人提的问题及解决方案，可能会有人已经解决过你现在遇到的问题.
     * 提issue.
     * 通过QQ联系我，我的QQ：847736308.
