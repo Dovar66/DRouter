@@ -156,6 +156,11 @@
     
 附一个AS插件，可能用得上：[一键Git Pull项目下所有仓库的当前分支](https://github.com/Dovar66/gitpullextender)
 
+### todo
+
+    * 动作路由调整：进程内使用ServiceLoader策略，进程间使用现有的Provider。
+    * 支持跨APP的组件调用
+
 
 
 
