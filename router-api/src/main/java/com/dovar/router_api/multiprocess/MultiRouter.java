@@ -12,10 +12,10 @@ import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.dovar.router_api.utils.Debugger;
 import com.dovar.router_api.ILocalRouterAIDL;
-import com.dovar.router_api.router.Router;
-import com.dovar.router_api.router.RouterUtil;
+import com.dovar.router_api.router.ProxyRT;
+import com.dovar.router_api.utils.Debugger;
+import com.dovar.router_api.utils.ProcessUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +25,7 @@ import java.util.Map;
  * description: 广域路由
  * 只在{@link MultiRouterService}中被调用，由于MultiRouterService被指定在主进程中，所以MultiRouter只会被主进程访问
  */
-public class MultiRouter {
+class MultiRouter {
     private static MultiRouter instance;
     private Application mApplication;
     private HashMap<String, ILocalRouterAIDL> mLocalRouterAIDLMap;
@@ -51,7 +51,7 @@ public class MultiRouter {
     }
 
     public static void registerLocalRouter(Application app, String processName, Class<? extends ConnectMultiRouterService> targetClass) {
-        String processAppName = RouterUtil.getProcessName(app);
+        String processAppName = ProcessUtil.getProcessName(app);
         if (processAppName == null || !processAppName.equalsIgnoreCase(app.getPackageName())) {
             //非主进程时不做任何事情
             return;
@@ -77,18 +77,18 @@ public class MultiRouter {
     /**
      * gradle插件会修改这个方法，插入类似如下代码:
      * Map hashMap = new HashMap();
-     * hashMap.put(":guard", CommuStubService0.class);
-     * hashMap.put(":banana", CommuStubService1.class);
-     * hashMap.put("com.android.apple", CommuStubService2.class);
-     * hashMap.put(":test4", CommuStubService3.class);
-     * hashMap.put("com.android.test5", CommuStubService4.class);
-     * hashMap.put(":apple", CommuStubService5.class);
-     * hashMap.put(":tea", CommuStubService6.class);
-     * hashMap.put("com.android.test6", CommuStubService7.class);
-     * hashMap.put(":test3", CommuStubService8.class);
-     * hashMap.put(":test2", CommuStubService9.class);
-     * hashMap.put(":test1", CommuStubService10.class);
-     * return matchedServices;
+     * hashMap.put(":a", CommuStubService0.class);
+     * hashMap.put(":b", CommuStubService1.class);
+     * hashMap.put("c", CommuStubService2.class);
+     * hashMap.put(":d", CommuStubService3.class);
+     * hashMap.put("e", CommuStubService4.class);
+     * hashMap.put(":f", CommuStubService5.class);
+     * hashMap.put(":g", CommuStubService6.class);
+     * hashMap.put("h", CommuStubService7.class);
+     * hashMap.put(":i", CommuStubService8.class);
+     * hashMap.put(":j", CommuStubService9.class);
+     * hashMap.put(":k", CommuStubService10.class);
+     * return hashMap;
      */
     //由于javassist不支持泛型，故不能返回Class,只能返回Object
     private static Object getTargetService() {
@@ -137,7 +137,7 @@ public class MultiRouter {
         }
         //主进程
         if (process.equals(mApplication.getPackageName())) {
-            return RouterUtil.createMultiResponse(Router.instance().localRoute(RouterUtil.backToRequest(routerRequest)));
+            return ProxyMRT.r(routerRequest);
         }
         //其他进程
         if (mLocalRouterAIDLMap == null) {
@@ -165,7 +165,7 @@ public class MultiRouter {
 
     void publish(String key, Bundle bundle) {
         //主进程
-        Router.instance().localPublish(key, bundle);
+        ProxyRT.lp(key, bundle);
         //其他进程
         if (mLocalRouterAIDLMap == null) {
             mLocalRouterAIDLMap = new HashMap<>();

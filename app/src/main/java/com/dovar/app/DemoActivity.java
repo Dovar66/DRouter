@@ -9,9 +9,9 @@ import android.widget.TextView;
 
 import com.dovar.router_annotation.Path;
 import com.dovar.router_api.router.DRouter;
-import com.dovar.router_api.router.RouterUtil;
 import com.dovar.router_api.router.eventbus.EventCallback;
 import com.dovar.router_api.router.ui.forresult.Callback;
+import com.dovar.router_api.utils.ProcessUtil;
 import com.example.common_base.ToastUtil;
 import com.example.common_service.Actions;
 import com.example.common_service.Pages;
@@ -29,7 +29,7 @@ public class DemoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         TextView tv_info = findViewById(R.id.tv_info);
-        tv_info.setText("当前组件：app\n当前进程：" + RouterUtil.getProcessName(this));
+        tv_info.setText("当前组件：app\n当前进程：" + ProcessUtil.getProcessName(this));
 
         addViewClickEvent(R.id.btn_navigator_a_second, new View.OnClickListener() {
             @Override
@@ -91,7 +91,7 @@ public class DemoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 bundle.putString("content", "事件A");
-                bundle.putString("process", RouterUtil.getProcessName(DemoActivity.this));
+                bundle.putString("process", ProcessUtil.getProcessName(DemoActivity.this));
                 DRouter.publish(ServiceKey.EVENT_A, bundle);
             }
         });

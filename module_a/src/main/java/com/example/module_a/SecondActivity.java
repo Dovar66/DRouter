@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import com.dovar.router_annotation.Path;
-import com.dovar.router_api.router.RouterUtil;
+import com.dovar.router_api.utils.ProcessUtil;
 import com.example.common_service.Pages;
 
 @Path(path = Pages.A_SECOND)
@@ -18,7 +18,7 @@ public class SecondActivity extends AppCompatActivity {
         setContentView(R.layout.module_a_activity_second);
 
         TextView tv_info = findViewById(R.id.tv_info);
-        tv_info.setText("当前页面：SecondActivity\n当前组件：module_a\n当前进程：" + RouterUtil.getProcessName(this));
+        tv_info.setText("当前页面：SecondActivity\n当前组件：module_a\n当前进程：" + ProcessUtil.getProcessName(this));
     }
 
     @Override

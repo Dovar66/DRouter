@@ -1,20 +1,10 @@
-package com.dovar.router_api.router;
+package com.dovar.router_api.router.cache;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.os.Parcelable;
-import android.support.annotation.NonNull;
-import android.text.TextUtils;
-
-import com.dovar.router_api.utils.Debugger;
-import com.dovar.router_api.multiprocess.MultiRouterRequest;
-import com.dovar.router_api.multiprocess.MultiRouterResponse;
-import com.dovar.router_api.router.service.RouterRequest;
-import com.dovar.router_api.router.service.RouterResponse;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,63 +16,7 @@ import java.util.regex.Pattern;
 
 import dalvik.system.DexFile;
 
-/**
- * auther by heweizong on 2018/8/21
- * description:
- */
-public class RouterUtil {
-
-    @NonNull
-    public static MultiRouterResponse createMultiResponse(RouterResponse mResponse) {
-        MultiRouterResponse multiResponse = new MultiRouterResponse();
-        if (mResponse == null) {
-            multiResponse.setMessage("RouterUtil：参数RouterResponse为空");
-            return multiResponse;
-        }
-        multiResponse.setMessage(mResponse.getMessage());
-        Object obj = mResponse.getData();
-        if (obj instanceof Parcelable) {
-            multiResponse.setData((Parcelable) obj);
-        } else if (obj != null) {
-            //跨进程时必须为Parcelable
-            Debugger.e("createMultiResponse: object must implement Parcelable in MultiRouter");
-        }
-        return multiResponse;
-    }
-
-    public static RouterRequest backToRequest(MultiRouterRequest mMultiRouterRequest) {
-        if (mMultiRouterRequest == null) return null;
-        return RouterRequest.Builder.obtain(mMultiRouterRequest.getProvider(), mMultiRouterRequest.getAction())
-                .setParams(mMultiRouterRequest.getParams())
-                .extra(mMultiRouterRequest.getExtra())
-                .buildInternal();
-    }
-
-
-    public static String getProcessName(Context context) {
-        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        if (am == null) return null;
-        List<ActivityManager.RunningAppProcessInfo> runningApps = am.getRunningAppProcesses();
-        if (runningApps == null) {
-            return null;
-        }
-        for (ActivityManager.RunningAppProcessInfo proInfo : runningApps) {
-            if (proInfo.pid == android.os.Process.myPid()) {
-                return proInfo.processName;
-            }
-        }
-        return null;
-    }
-
-    public static boolean isMainProcess(Context context) {
-        String process = getProcessName(context);
-        return isMainProcess(context, process);
-    }
-
-    public static boolean isMainProcess(Context context, String process) {
-        return (!TextUtils.isEmpty(process)) && process.equals(context.getPackageName());
-    }
-
+class ClassUtil {
     private static final String EXTRACTED_NAME_EXT = ".classes";
     private static final String EXTRACTED_SUFFIX = ".zip";
     private static final String KEY_DEX_NUMBER = "dex.number";

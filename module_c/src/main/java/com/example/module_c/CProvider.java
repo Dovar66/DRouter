@@ -5,13 +5,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 
-import com.dovar.router_annotation.ServiceLoader;
+import com.dovar.router_annotation.Provider;
+import com.dovar.router_api.router.service.AbsProvider;
 import com.dovar.router_api.router.service.Action;
-import com.dovar.router_api.router.service.Provider;
 import com.dovar.router_api.router.service.RouterResponse;
 
-@ServiceLoader(key = "c")
-public class CProvider extends Provider {
+@Provider(key = "c")
+public class CProvider extends AbsProvider {
     @Override
     protected void registerActions() {
         registerAction("test", new Action() {

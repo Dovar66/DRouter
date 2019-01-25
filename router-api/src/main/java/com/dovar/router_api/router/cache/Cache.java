@@ -5,14 +5,13 @@ import android.app.Application;
 import android.content.pm.PackageManager;
 
 import com.dovar.router_annotation.string.RouterStr;
-import com.dovar.router_api.utils.Debugger;
 import com.dovar.router_api.compiler.RouterInjector;
 import com.dovar.router_api.compiler.RouterMapCreator;
-import com.dovar.router_api.router.RouterUtil;
-import com.dovar.router_api.router.service.Provider;
+import com.dovar.router_api.router.service.AbsProvider;
 import com.dovar.router_api.router.service.ServiceLoader;
 import com.dovar.router_api.router.ui.IInterceptor;
 import com.dovar.router_api.router.ui.UIRouter;
+import com.dovar.router_api.utils.Debugger;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -27,7 +26,7 @@ public class Cache {
 
     private final static HashMap<String, Class<? extends IInterceptor>> mInterceptorMap = new HashMap<>();//拦截器表
     private final static HashMap<String, Class<? extends Activity>> mActivityMap = new HashMap<>();//界面路由表
-    private final static HashMap<String, Class<? extends Provider>> mProviderMap = new HashMap<>();//动作路由表
+    private final static HashMap<String, Class<? extends AbsProvider>> mProviderMap = new HashMap<>();//动作路由表
 
     private static AtomicInteger activityCounter = new AtomicInteger();//采用静态计数记录已注册的条目数，从路由表取用时如果发现计数不匹配则说明部分条目已被回收
     private static AtomicInteger interceptorCounter = new AtomicInteger();//采用静态计数记录已设置的拦截器，从拦截器表取用时如果发现计数不匹配则说明部分条目已被回收
@@ -41,7 +40,7 @@ public class Cache {
         //通过注解生成的代理类的存放路径，最末位的“.”不能省略，否则会匹配到com.dovar.router_api包
         String mProxyClassPackage = RouterStr.ProxyClassPackage + ".";
         try {
-            classFileNames = RouterUtil.getFileNameByPackageName(app, mProxyClassPackage);
+            classFileNames = ClassUtil.getFileNameByPackageName(app, mProxyClassPackage);
             for (String mProxyClassFullName : classFileNames
                     ) {
                 //前面找到的classFileNames中可能会存在非xxxInjector子类
@@ -114,7 +113,7 @@ public class Cache {
         interceptorCounter.set(mInterceptorMap.size());
     }
 
-    public static void initProviderMap(Map<String, Class<? extends Provider>> map) {
+    public static void initProviderMap(Map<String, Class<? extends AbsProvider>> map) {
         mProviderMap.putAll(map);
         providerCounter.set(mProviderMap.size());
     }
@@ -135,7 +134,7 @@ public class Cache {
         return mInterceptorMap;
     }
 
-    public static Map<String, Class<? extends Provider>> getProviderMap() {
+    public static Map<String, Class<? extends AbsProvider>> getProviderMap() {
         if (providerCounter.get() != mProviderMap.size()) {
             reCreateMaps();
 //        createProviderMap();

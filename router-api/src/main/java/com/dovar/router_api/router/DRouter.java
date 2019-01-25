@@ -6,11 +6,11 @@ import android.arch.lifecycle.Observer;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import com.dovar.router_api.utils.Debugger;
 import com.dovar.router_api.multiprocess.MultiRouterRequest;
 import com.dovar.router_api.router.eventbus.EventCallback;
 import com.dovar.router_api.router.service.RouterRequest;
 import com.dovar.router_api.router.ui.Postcard;
+import com.dovar.router_api.utils.Debugger;
 
 
 public class DRouter {

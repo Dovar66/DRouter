@@ -2,11 +2,11 @@ package com.dovar.router_api.router.service;
 
 import java.util.HashMap;
 
-public abstract class Provider {
+public abstract class AbsProvider {
 
     private HashMap<String, Action> actions;
 
-    public Provider() {
+    public AbsProvider() {
         actions = new HashMap<>();
         registerActions();
     }
@@ -17,7 +17,7 @@ public abstract class Provider {
     }
 
 
-    public Action findAction(String key) {
+    Action findAction(String key) {
         return actions.get(key);
     }
 

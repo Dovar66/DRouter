@@ -1,9 +1,11 @@
 package com.dovar.router_api.router.service;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 
-import com.dovar.router_api.utils.Debugger;
 import com.dovar.router_api.router.cache.Cache;
+import com.dovar.router_api.utils.Debugger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,9 +16,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ServiceLoader {
 
-    private final HashMap<String, Provider> mProviders;//value不允许为空
+    private final HashMap<String, AbsProvider> mProviders;//value不允许为空
     private static AtomicInteger providerCounter = new AtomicInteger();//采用静态计数记录已注册的条目数，从路由表取用时如果发现计数不匹配则说明部分条目已被回收
-
+    private static Handler mHandler;
 
     private ServiceLoader() {
         mProviders = new HashMap<>();
@@ -30,12 +32,12 @@ public class ServiceLoader {
         private static final ServiceLoader DEFAULT = new ServiceLoader();
     }
 
-    public void initProviderMap(Map<String, Class<? extends Provider>> map) {
+    public void initProviderMap(Map<String, Class<? extends AbsProvider>> map) {
         if (map == null) return;
-        for (Map.Entry<String, Class<? extends Provider>> entry : map.entrySet()
+        for (Map.Entry<String, Class<? extends AbsProvider>> entry : map.entrySet()
                 ) {
             try {
-                Provider p = entry.getValue().newInstance();
+                AbsProvider p = entry.getValue().newInstance();
                 if (p != null) {
                     mProviders.put(entry.getKey(), p);
                 }
@@ -54,7 +56,7 @@ public class ServiceLoader {
      * @param key
      * @param mProvider
      */
-/*    public void registerProvider(String key, Provider mProvider) {
+/*    public void registerProvider(String key, AbsProvider mProvider) {
         if (TextUtils.isEmpty(key)) return;
         mProviders.put(key, mProvider);
     }*/
@@ -73,7 +75,7 @@ public class ServiceLoader {
             Debugger.w("路由表计数异常，部分表可能已被系统回收");
             initProviderMap(Cache.getProviderMap());
         }
-        Provider provider = mProviders.get(mRequest.getProvider());
+        AbsProvider provider = mProviders.get(mRequest.getProvider());
         if (provider != null) {
             Action mAction = provider.findAction(mRequest.getAction());
             if (mAction != null) {
@@ -87,15 +89,30 @@ public class ServiceLoader {
     }
 
     @NonNull
-    public RouterResponse load(RouterRequest mRouterRequest) {
+    public RouterResponse load(final RouterRequest mRouterRequest) {
         RouterResponse mResponse = new RouterResponse();
         if (mRouterRequest == null) {
             mResponse.setMessage("RouterRequest为空");
             return mResponse;
         }
-        Action mAction = ServiceLoader.instance().findRequestAction(mRouterRequest);
+        final Action mAction = ServiceLoader.instance().findRequestAction(mRouterRequest);
         if (mAction == null) return mResponse;
-        mResponse = mAction.invoke(mRouterRequest.getParams(), mRouterRequest.getExtra());
+        if (mRouterRequest.isRunOnUiThread() && Looper.getMainLooper().getThread() != Thread.currentThread()) {
+            mResponse.setMessage("Action被切换到主线程执行...");
+            //子线程切换到主线程
+            //todo是否需要阻塞子线程等待主线程返回结果？？
+            if (mHandler == null) {
+                mHandler = new Handler(Looper.getMainLooper());
+            }
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mAction.invoke(mRouterRequest.getParams(), mRouterRequest.getExtra());
+                }
+            });
+        } else {
+            mResponse = mAction.invoke(mRouterRequest.getParams(), mRouterRequest.getExtra());
+        }
         if (mResponse == null) {
             mResponse = new RouterResponse();
         }

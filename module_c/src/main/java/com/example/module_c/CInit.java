@@ -1,7 +1,6 @@
 package com.example.module_c;
 
 import com.dovar.router_annotation.Module;
-import com.dovar.router_api.multiprocess.MultiRouter;
 import com.dovar.router_api.router.BaseAppInit;
 
 @Module

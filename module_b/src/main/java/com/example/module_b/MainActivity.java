@@ -8,7 +8,7 @@ import android.widget.Toast;
 
 import com.dovar.router_annotation.Path;
 import com.dovar.router_api.router.DRouter;
-import com.dovar.router_api.router.RouterUtil;
+import com.dovar.router_api.utils.ProcessUtil;
 import com.dovar.router_api.router.eventbus.EventCallback;
 import com.example.common_service.Pages;
 import com.example.common_service.ServiceKey;
@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.module_b_activity_main);
 
         TextView tv_info = findViewById(R.id.tv_info);
-        tv_info.setText("当前页面：MainActivity\n当前组件：module_b\n当前进程：" + RouterUtil.getProcessName(this));
+        tv_info.setText("当前页面：MainActivity\n当前组件：module_b\n当前进程：" + ProcessUtil.getProcessName(this));
 
         findViewById(R.id.bt_event_b).setOnClickListener(new View.OnClickListener() {
             @Override

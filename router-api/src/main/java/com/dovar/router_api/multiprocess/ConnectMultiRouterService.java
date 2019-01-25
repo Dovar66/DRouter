@@ -8,8 +8,7 @@ import android.os.RemoteException;
 import android.support.annotation.Nullable;
 
 import com.dovar.router_api.ILocalRouterAIDL;
-import com.dovar.router_api.router.Router;
-import com.dovar.router_api.router.RouterUtil;
+import com.dovar.router_api.router.ProxyRT;
 
 
 /**
@@ -31,7 +30,7 @@ public class ConnectMultiRouterService extends Service {
         @Override
         public MultiRouterResponse route(MultiRouterRequest routerRequest) throws RemoteException {
             try {
-                return RouterUtil.createMultiResponse(Router.instance().localRoute(RouterUtil.backToRequest(routerRequest)));
+                return ProxyMRT.r(routerRequest);
             } catch (Exception e) {
                 e.printStackTrace();
                 MultiRouterResponse multiResponse = new MultiRouterResponse();
@@ -42,18 +41,18 @@ public class ConnectMultiRouterService extends Service {
 
         @Override
         public void publish(String key, Bundle bundle) throws RemoteException {
-            Router.instance().localPublish(key, bundle);
+            ProxyRT.lp(key, bundle);
         }
 
         @Override
         public boolean stopWideRouter() throws RemoteException {
-            Router.instance().unbindMultiRouter();
+            ProxyRT.unbindMultiRouter();
             return true;
         }
 
         @Override
         public void connectWideRouter() throws RemoteException {
-            Router.instance().bindMultiRouter();
+            ProxyRT.bindMultiRouter();
         }
     };
 

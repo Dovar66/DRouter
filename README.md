@@ -1,25 +1,26 @@
 
-## DRouter：支持多进程架构的组件化方案
+## DRouter：简单易用的支持多进程架构的组件化方案
 
-[demo下载](https://github.com/Dovar66/DRouter/blob/master/assets/app-debug.apk)
+[Demo下载](https://github.com/Dovar66/DRouter/blob/master/assets/app-debug.apk)
+
+DRouter主要提供三大功能：界面路由、动作路由、事件总线，使开发者不用了解AIDL机制就可以进行进程间通信，目前已应用于[触电新闻](https://sj.qq.com/myapp/detail.htm?apkName=com.touchtv.touchtv).
 
 ### 框架特点
 
     * 完美支持多进程，且不需要使用者去bindService或自定义AIDL.
     * 页面路由：支持给Activity定义url，然后通过url跳转到Activity,支持添加拦截器.
-    * 跨进程的事件总线.
-    * 支持跨进程的API调用.
-    * 充分实现模块解耦，页面路由、API调用、事件总线均支持跨模块使用.
-    * 基于AOP引导Module的初始化以及页面、拦截器、provider的自动注册.
+    * 支持跨进程的API调用(动作路由).
+    * 支持跨进程的事件总线.
+    * 基于AOP引导Module的初始化以及页面、拦截器、Provider的自动注册.
 
 ### 如何配置
 1.在BaseModule中添加依赖：
 
-    api 'com.github.Dovar66.DRouter:router-api:1.0.0'
+    api 'com.github.Dovar66.DRouter:router-api:1.0.1'
 
 2.在其他需要用到DRouter的组件中添加注解处理器的依赖：
 
-    annotationProcessor 'com.github.Dovar66.DRouter:router-compiler:1.0.0'
+    annotationProcessor 'com.github.Dovar66.DRouter:router-compiler:1.0.1'
 
     同时在这些组件的defaultConfig中配置注解参数，指定唯一的组件名：
 
@@ -58,6 +59,24 @@
 #### 在Application.onCreate()中完成初始化
 
     DRouter.init(app);
+    
+#### 创建组件初始化入口(非必须)
+
+    在组件中创建BaseAppInit的子类，并添加Module注解:
+
+        @Module
+        public class AInit extends BaseAppInit {
+
+            @Override
+            public void onCreate() {
+                super.onCreate();
+                //与Application.onCreate()的执行时机相同
+                //建议在这里完成组件内的初始化工作
+            }
+        }
+        
+    注解处理器会将AInit注册到DRouter，当DRouter初始化时，会调用被注册的BaseAppInit子类的onCreate().
+    BaseAppInit中提供了Application实例，用于组件工程中获取全局的应用上下文.
 
 #### 页面路由
 
@@ -79,10 +98,10 @@
 
 #### 动作路由(API调用)
 
-    创建相应的Provider子类并添加ServiceLoader注解，然后在类中注册Action:
+    创建相应的AbsProvider子类并添加Provider注解，然后在类中注册Action:
 
-    @ServiceLoader(key = "a")
-    public class AProvider extends Provider {
+    @Provider(key = "a")
+    public class AProvider extends AbsProvider {
         @Override
         protected void registerActions() {
 
@@ -114,7 +133,15 @@
                            .withString("content","也弹个窗")
                            .extra(context)
                            .route();
-
+           //跨进程调用            
+           DRouter.multiRouter("a","test1").route(process);
+           
+    需要注意的是，跨进程调用时，目标Action将会在Binder线程中执行，可以通过设置runOnUiThread指定Action在ui线程执行.
+    
+           DRouter.multiRouter("a","test1")
+                               .runOnUiThread()
+                               .route(process);
+           
 #### 事件总线
 
 ##### 订阅事件
@@ -137,7 +164,7 @@
             }
         });
 
-##### 发布事件(在任意线程)
+##### 发布事件(在任意线程)(开启多进程配置后，事件会分发到所有进程)
 
      Bundle bundle = new Bundle();
      bundle.putString("content", "事件A");
@@ -146,21 +173,6 @@
 ##### 退订事件(通过subscribeForever()订阅时,需要及时取消订阅)
 
      DRouter.unsubscribe("event_a", mObserver);
-
-#### 创建组件初始化入口(非必须)
-
-    在组件中创建BaseAppInit的子类，添加Router注解:
-
-        @Module
-        public class AInit extends BaseAppInit {
-
-            @Override
-            public void onCreate() {
-                super.onCreate();
-                //与Application.onCreate()的执行时机相同
-                //建议在这里完成组件内的初始化工作
-            }
-        }
         
 ### 组件化改造建议
 
@@ -192,17 +204,38 @@
         拆分第二个组件、第三个...
     组件拆分粒度取决于你的业务模块划分和组员开发职责划分，建议不要拆分出太多的组件。
 
-### TODO LIST
-
-* 支持跨APP的组件调用。
-
 ### 遇到问题怎么办？
 
+* 参考示例.
 * 打开DRouter日志开关，通过调用日志辅助分析.
-* 查阅[Wiki](https://github.com/Dovar66/DRouter/blob/master/wiki.md)了解DRouter的实现原理.
+* 查阅[Wiki](https://github.com/Dovar66/DRouter/blob/master/wiki.md)或阅读源码了解DRouter的实现原理.
 * 查看issue中其它人提的问题及解决方案，可能会有人已经解决过你现在遇到的问题.
 * 提issue.
 * 通过QQ联系我，我的QQ：847736308.
 
 
-我的其他项目：[同学，你的系统Toast可能需要修复一下！](https://github.com/Dovar66/DToast)
+### 我的其他项目
+
+[同学，你的系统Toast可能需要修复一下！](https://github.com/Dovar66/DToast)
+
+### MIT License
+
+Copyright (c) 2019 Dovar66
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

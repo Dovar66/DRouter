@@ -13,7 +13,8 @@ public @interface Path {
     String path();
 
     /**
-     * interceptor.default值是随便写的，只是为了使用者可以缺省interceptor
+     * default value is written casually("String.class" is invalid).
+     * please use IInterceptor in formal.
      */
     Class interceptor() default String.class;
 }

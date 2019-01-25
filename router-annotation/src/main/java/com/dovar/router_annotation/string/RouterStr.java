@@ -16,6 +16,6 @@ public interface RouterStr {
     String BaseAppInitPackage = "com.dovar.router_api.router";
     String BaseAppInitSimpleName = "BaseAppInit";
 
-    String Provider_CLASS = "com.dovar.router_api.router.service.Provider";
+    String Provider_CLASS = "com.dovar.router_api.router.service.AbsProvider";
     String IInterceptor_CLASS = "com.dovar.router_api.router.ui.IInterceptor";
 }

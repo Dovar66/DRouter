@@ -2,7 +2,7 @@ package com.dovar.router_api.compiler;
 
 import android.app.Activity;
 
-import com.dovar.router_api.router.service.Provider;
+import com.dovar.router_api.router.service.AbsProvider;
 import com.dovar.router_api.router.ui.IInterceptor;
 
 import java.util.HashMap;
@@ -17,5 +17,5 @@ public interface RouterMapCreator {
 
     HashMap<String, Class<? extends IInterceptor>> createInterceptorMap();
 
-    HashMap<String, Class<? extends Provider>> createProviderMap();
+    HashMap<String, Class<? extends AbsProvider>> createProviderMap();
 }

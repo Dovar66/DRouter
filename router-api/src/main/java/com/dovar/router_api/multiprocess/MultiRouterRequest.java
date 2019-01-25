@@ -5,8 +5,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
 
+import com.dovar.router_api.router.ProxyRT;
 import com.dovar.router_api.utils.Debugger;
-import com.dovar.router_api.router.Router;
 
 import java.io.Serializable;
 
@@ -14,12 +14,13 @@ import java.io.Serializable;
  * auther by heweizong on 2018/8/21
  * description:跨进程的路由请求
  */
-public class MultiRouterRequest implements Parcelable {
+public final class MultiRouterRequest implements Parcelable {
     private String provider;
     private String action;
     private String process;//进程标识
     private Bundle params;
     private Parcelable extra;
+    private boolean runOnUiThread;//指定在主线程执行
 
     private MultiRouterRequest(Builder mBuilder) {
         this.process = mBuilder.process;
@@ -27,6 +28,7 @@ public class MultiRouterRequest implements Parcelable {
         this.action = mBuilder.action;
         this.params = mBuilder.params;
         this.extra = mBuilder.extra;
+        this.runOnUiThread = mBuilder.runOnUiThread;
     }
 
     public String getProvider() {
@@ -69,6 +71,14 @@ public class MultiRouterRequest implements Parcelable {
         this.extra = mExtra;
     }
 
+    public boolean isRunOnUiThread() {
+        return runOnUiThread;
+    }
+
+    public void setRunOnUiThread(boolean mRunOnUiThread) {
+        runOnUiThread = mRunOnUiThread;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -81,6 +91,7 @@ public class MultiRouterRequest implements Parcelable {
         dest.writeString(this.process);
         dest.writeBundle(this.params);
         dest.writeParcelable(this.extra, flags);
+        dest.writeInt(this.runOnUiThread ? 1 : 0);
     }
 
     public MultiRouterRequest() {
@@ -92,6 +103,7 @@ public class MultiRouterRequest implements Parcelable {
         this.process = in.readString();
         this.params = in.readBundle(getClass().getClassLoader());
         this.extra = in.readParcelable(Parcelable.class.getClassLoader());
+        this.runOnUiThread = in.readInt() != 0;
     }
 
     public static final Creator<MultiRouterRequest> CREATOR = new Creator<MultiRouterRequest>() {
@@ -113,6 +125,7 @@ public class MultiRouterRequest implements Parcelable {
         private String action;
         private Bundle params;
         private Parcelable extra;
+        private boolean runOnUiThread;//指定在主线程执行
 
         private Builder(String provider, String action) {
             this.provider = provider;
@@ -165,12 +178,18 @@ public class MultiRouterRequest implements Parcelable {
             return this;
         }
 
+        public Builder runOnUiThread() {
+            this.runOnUiThread = true;
+            return this;
+        }
+
         public MultiRouterResponse route(String process) {
             this.process = process;
             if (TextUtils.isEmpty(provider) || TextUtils.isEmpty(action)) {
                 Debugger.w("MultiRouterRequest: provider and action cannot be empty!");
             }
-            return Router.instance().multiRoute(new MultiRouterRequest(this));
+
+            return ProxyRT.mr(new MultiRouterRequest(this));
         }
     }
 }

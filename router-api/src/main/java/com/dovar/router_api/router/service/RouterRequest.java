@@ -4,19 +4,20 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.dovar.router_api.router.ProxyRT;
 import com.dovar.router_api.utils.Debugger;
-import com.dovar.router_api.router.Router;
 
 import java.io.Serializable;
 
 /**
  * router请求
  */
-public class RouterRequest {
+public final class RouterRequest {
     private String provider;
     private String action;
     private Bundle params;
     private Object extra;
+    private boolean runOnUiThread;//指定在主线程执行
 
     public String getProvider() {
         return provider;
@@ -36,11 +37,21 @@ public class RouterRequest {
         return extra;
     }
 
+    public boolean isRunOnUiThread() {
+        return runOnUiThread;
+    }
+
+    RouterRequest setRunOnUiThread(boolean mRunOnUiThread) {
+        runOnUiThread = mRunOnUiThread;
+        return this;
+    }
+
     private RouterRequest(Builder mBuilder) {
         this.provider = mBuilder.provider;
         this.action = mBuilder.action;
         this.params = mBuilder.params;
         this.extra = mBuilder.extra;
+        this.runOnUiThread = mBuilder.runOnUiThread;
     }
 
     public static class Builder {
@@ -49,6 +60,7 @@ public class RouterRequest {
         private Bundle params;
 
         private Object extra;
+        private boolean runOnUiThread;
 
         private Builder(String provider, String action) {
             this.provider = provider;
@@ -101,15 +113,17 @@ public class RouterRequest {
             return this;
         }
 
-        public RouterResponse route() {
-            return Router.instance().localRoute(buildInternal());
+        public Builder runOnUiThread() {
+            this.runOnUiThread = true;
+            return this;
         }
 
-        public RouterRequest buildInternal() {
+        public RouterResponse route() {
             if (TextUtils.isEmpty(provider) || TextUtils.isEmpty(action)) {
                 Debugger.w("RouterRequest: provider and action cannot be empty!");
             }
-            return new RouterRequest(this);
+
+            return ProxyRT.lr(new RouterRequest(this));
         }
     }
 }

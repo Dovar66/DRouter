@@ -15,7 +15,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.dovar.router_api.utils.Debugger;
 import com.dovar.router_api.IMultiRouter;
 import com.dovar.router_api.multiprocess.IMultiProcess;
 import com.dovar.router_api.multiprocess.MultiRouterRequest;
@@ -29,14 +28,16 @@ import com.dovar.router_api.router.service.RouterResponse;
 import com.dovar.router_api.router.service.ServiceLoader;
 import com.dovar.router_api.router.ui.Postcard;
 import com.dovar.router_api.router.ui.UIRouter;
+import com.dovar.router_api.utils.Debugger;
+import com.dovar.router_api.utils.ProcessUtil;
 import com.dovar.router_api.utils.ServiceUtil;
 
 /**
  * 如果是多进程应用，那么每个进程都会存在一个Router对象，
- * 但{@link com.dovar.router_api.multiprocess.MultiRouter}只存在于主进程中，
+ * 但MultiRouter只存在于主进程中，
  * 所有Router的跨进程操作最终都会指向MultiRouter.
  */
-public final class Router {
+final class Router {
     private boolean hasInit = false;
     private Application mRouterContext;
     private String mProcessName;
@@ -66,7 +67,7 @@ public final class Router {
         if (app == null) return;
         if (!hasInit) {
             this.mRouterContext = app;
-            this.mProcessName = RouterUtil.getProcessName(app);
+            this.mProcessName = ProcessUtil.getProcessName(app);
             Cache.initByCompiler(mRouterContext);
             if (mRouterContext instanceof IMultiProcess) {
                 bindMultiRouter();
@@ -84,7 +85,7 @@ public final class Router {
     public void bindMultiRouter() {
         if (mRouterContext == null) return;
         if (mProcessName == null) {
-            mProcessName = RouterUtil.getProcessName(mRouterContext);
+            mProcessName = ProcessUtil.getProcessName(mRouterContext);
         }
         Intent mIntent = new Intent();
         Debugger.d("bindMultiRouter");

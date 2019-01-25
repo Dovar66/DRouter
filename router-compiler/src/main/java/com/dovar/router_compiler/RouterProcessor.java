@@ -2,7 +2,7 @@ package com.dovar.router_compiler;
 
 import com.dovar.router_annotation.Path;
 import com.dovar.router_annotation.Module;
-import com.dovar.router_annotation.ServiceLoader;
+import com.dovar.router_annotation.Provider;
 import com.dovar.router_annotation.string.RouterStr;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
@@ -53,7 +53,7 @@ public class RouterProcessor extends AbstractProcessor {
         Set<String> supportTypes = new HashSet<>();
         supportTypes.add(Module.class.getCanonicalName());
         supportTypes.add(Path.class.getCanonicalName());
-        supportTypes.add(ServiceLoader.class.getCanonicalName());
+        supportTypes.add(Provider.class.getCanonicalName());
         return supportTypes;
     }
 
@@ -103,8 +103,8 @@ public class RouterProcessor extends AbstractProcessor {
 
             Set<? extends Element> uiPath = roundEnv.getElementsAnnotatedWith(Path.class);
             generateUIPathMap(mBuilder, uiPath);
-            Set<? extends Element> serviceLoaders = roundEnv.getElementsAnnotatedWith(ServiceLoader.class);
-            generateServiceMap(mBuilder, serviceLoaders);
+            Set<? extends Element> providers = roundEnv.getElementsAnnotatedWith(Provider.class);
+            generateServiceMap(mBuilder, providers);
 
             try {
                 JavaFile.builder(RouterStr.ProxyClassPackage, mBuilder.build())
@@ -117,24 +117,24 @@ public class RouterProcessor extends AbstractProcessor {
         }
     }
 
-    private void generateServiceMap(TypeSpec.Builder mBuilder, Set<? extends Element> serviceLoaders) {
-        debug("Process ServiceLoader...");
+    private void generateServiceMap(TypeSpec.Builder mBuilder, Set<? extends Element> providers) {
+        debug("Process Provider...");
 
         MethodSpec.Builder createProviderMap = MethodSpec.methodBuilder("createProviderMap")
                 .addModifiers(Modifier.PUBLIC)
                 .returns(HashMap.class);
 
         createProviderMap.addStatement("$T map= new $T()", HashMap.class, HashMap.class);
-        if (serviceLoaders != null && serviceLoaders.size() > 0) {
-            for (Element e : serviceLoaders
+        if (providers != null && providers.size() > 0) {
+            for (Element e : providers
                     ) {
                 if (e.getKind() == ElementKind.CLASS) {
-                    String key = e.getAnnotation(ServiceLoader.class).key();
+                    String key = e.getAnnotation(Provider.class).key();
                     ClassName className = ClassName.get((TypeElement) e);
                     if (isConcreteSubType(e, RouterStr.Provider_CLASS)) {
                         createProviderMap.addStatement("map.put(\"" + key + "\",$T.class)", className);
                     } else {
-                        debug(className.packageName() + "." + className.simpleName() + "不是有效值，标注为ServiceLoader的类必须是" + RouterStr.Provider_CLASS + "的非抽象子类");
+                        debug(className.packageName() + "." + className.simpleName() + "不是有效值，标注为Provider的类必须是" + RouterStr.Provider_CLASS + "的非抽象子类");
                     }
                 }
             }
