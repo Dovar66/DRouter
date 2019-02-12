@@ -36,5 +36,4 @@ ext {
     versionName = "1.0.0"
 
     supportLibVersion = '27.1.1'
-    drouterVersion = "0.0.8"
 }

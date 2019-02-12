@@ -25,6 +25,27 @@ android {
     }
 
     resourcePrefix "app_"//增加资源命名前缀
+
+
+    buildTypes {
+        release {
+            shrinkResources true
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard.cfg'
+        }
+    }
+
+    flavorDimensions "default"
+    productFlavors {
+        demo {
+            dimension "default" //必须为flavorDimensions中的任一值
+        }
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
 }
 
 dependencies {

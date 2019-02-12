@@ -174,6 +174,10 @@ DRouter主要提供三大功能：界面路由、动作路由、事件总线，�
 
      DRouter.unsubscribe("event_a", mObserver);
         
+### 混淆配置
+
+    -keep class com.dovar.router.generate.** { *; }
+    
 ### 组件化改造建议
 
     完全的组件化拆分并非一两日就能完成，而我们的项目却总会不断有新的需求等待开发，版本迭代工作几乎注定了我们不可能将项目需求暂停来做组件化。
