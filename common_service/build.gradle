@@ -13,6 +13,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
 
     //需要依赖基础框架层
     api project(':common_base')

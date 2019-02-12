@@ -51,6 +51,7 @@ class MultiRouter {
     }
 
     public static void registerLocalRouter(Application app, String processName, Class<? extends ConnectMultiRouterService> targetClass) {
+        if (app == null || TextUtils.isEmpty(processName)) return;
         String processAppName = ProcessUtil.getProcessName(app);
         if (processAppName == null || !processAppName.equalsIgnoreCase(app.getPackageName())) {
             //非主进程时不做任何事情
@@ -67,7 +68,11 @@ class MultiRouter {
             HashMap<String, Class> maps = (HashMap<String, Class>) getTargetService();
             for (Map.Entry<String, Class> entry : maps.entrySet()
                     ) {
-                registerLocalRouter(app, entry.getKey(), entry.getValue());
+                String process = entry.getKey();
+                if (process != null && process.startsWith(":")) {
+                    process = ProcessUtil.getProcessName(app) + process;
+                }
+                registerLocalRouter(app, process, entry.getValue());
             }
         } catch (Exception e) {
             Debugger.e(e.getMessage());

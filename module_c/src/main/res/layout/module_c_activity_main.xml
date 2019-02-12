@@ -1,20 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/btn_subscribe"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="订阅事件A" />
+
+    <Button
+        android:id="@+id/btn_unsubscribe"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="退订事件A" />
+
+    <Button
+        android:id="@+id/btn_publish"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="发布事件A" />
+
+    <Button
+        android:id="@+id/btn_jump_publish"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="去其他进程发布事件A" />
+
+    <Space
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
     <TextView
         android:id="@+id/tv_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="c_main"/>
+        android:layout_marginBottom="10dp"
+        android:text="c_main" />
 
-    <Button
-        android:id="@+id/bt_event_a"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:text="发布事件A"/>
-
-</RelativeLayout>
+</LinearLayout>

@@ -2,20 +2,19 @@ package com.example.module_a;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.dovar.router_annotation.Route;
 import com.dovar.router_api.router.DRouter;
+import com.dovar.router_api.router.ui.forresult.Callback;
 import com.dovar.router_api.utils.ProcessUtil;
-import com.dovar.router_api.router.eventbus.EventCallback;
+import com.example.common_base.ToastUtil;
+import com.example.common_service.BaseActivity;
 import com.example.common_service.Pages;
-import com.example.common_service.ServiceKey;
 
 @Route(path = Pages.A_MAIN)
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,36 +24,49 @@ public class MainActivity extends AppCompatActivity {
         TextView tv_info = findViewById(R.id.tv_info);
         tv_info.setText("当前页面：MainActivity\n当前组件：module_a\n当前进程：" + ProcessUtil.getProcessName(this));
 
-        findViewById(R.id.bt_jumpToSecond).setOnClickListener(new View.OnClickListener() {
+        addViewClickEvent(R.id.btn_navigator_a_second, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, SecondActivity.class);
-                startActivity(intent);
+                DRouter.navigator(Pages.B_SECOND).navigateTo(MainActivity.this);
             }
         });
 
-        findViewById(R.id.bt_event_a).setOnClickListener(new View.OnClickListener() {
+        addViewClickEvent(R.id.btn_navigator4result, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putString("content", "事件A");
-                bundle.putString("process", ProcessUtil.getProcessName(MainActivity.this));
-                DRouter.publish(ServiceKey.EVENT_A, bundle);
+                //startActivityForResult的用法，需要在onActivityResult中处理回调
+                DRouter.navigator(Pages.B_SECOND).navigateForResult(MainActivity.this, 66);
             }
         });
 
-        DRouter.subscribe(this, ServiceKey.EVENT_B, new EventCallback() {
+        addViewClickEvent(R.id.btn_navigator_callback, new View.OnClickListener() {
             @Override
-            public void onEvent(Bundle e) {
-                Toast.makeText(MainActivity.this, "/a/main/收到事件B", Toast.LENGTH_SHORT).show();
+            public void onClick(View v) {
+                //推荐
+                //DRouter提供的直接使用Callback的用法，不需要重写onActivityResult
+                DRouter.navigator(Pages.B_SECOND).navigateForCallback(MainActivity.this, new Callback() {
+                    @Override
+                    public void onActivityResult(int resultCode, Intent data) {
+                        String s = "";
+                        if (data != null) {
+                            s = data.getStringExtra("callback");
+                        }
+                        ToastUtil.show(MainActivity.this, "navigateForCallback:" + s);
+                    }
+                });
             }
         });
+    }
 
-        DRouter.subscribe(this, ServiceKey.EVENT_C, new EventCallback() {
-            @Override
-            public void onEvent(Bundle e) {
-                Toast.makeText(MainActivity.this, "/a/main/收到事件C", Toast.LENGTH_SHORT).show();
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 66) {
+            String s = "";
+            if (data != null) {
+                s = data.getStringExtra("callback");
             }
-        });
+            ToastUtil.show(MainActivity.this, "startActivityForResult:" + s);
+        }
     }
 }

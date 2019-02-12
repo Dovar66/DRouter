@@ -5,7 +5,7 @@
     <application>
         <activity
             android:name=".MainActivity"
-            android:process=":cm" />
+            android:process=":c" />
         <activity
             android:name=".SecondActivity"
             android:process=":cs"></activity>

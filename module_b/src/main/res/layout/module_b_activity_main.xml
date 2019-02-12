@@ -1,21 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/btn_router"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="跨组件弹Toast" />
+
+    <Button
+        android:id="@+id/btn_multi_router"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="跨进程弹Toast" />
+
+    <Space
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
     <TextView
         android:id="@+id/tv_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:layout_marginBottom="10dp"
         android:text="b_main" />
-
-    <Button
-        android:id="@+id/bt_event_b"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:text="发送事件B" />
-</RelativeLayout>
+</LinearLayout>

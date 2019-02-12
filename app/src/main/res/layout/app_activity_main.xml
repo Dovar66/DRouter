@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".DemoActivity">
 
     <Button
-        android:id="@+id/btn_navigator_a_second"
+        android:id="@+id/btn_jump_ur"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="界面跳转" />
+        android:text="界面路由" />
 
     <Button
-        android:id="@+id/btn_navigator4result"
+        android:id="@+id/btn_jump_ar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="界面跳转ForResult" />
+        android:text="动作路由" />
 
     <Button
-        android:id="@+id/btn_navigator_callback"
+        android:id="@+id/btn_jump_eb"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="界面跳转 + Callback" />
+        android:text="事件总线" />
 
     <Space
         android:layout_width="1dp"
@@ -32,7 +34,7 @@
         android:id="@+id/tv_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:text="a_main" />
+        android:layout_marginBottom="10dp" />
+
 
 </LinearLayout>
