@@ -16,6 +16,5 @@ dependencies {
     api project(':router-annotation')
 
     api "android.arch.lifecycle:livedata:1.1.1"//LiveData
-    api "android.arch.lifecycle:runtime:1.1.1"//Lifecycles only
 
 }
