@@ -16,11 +16,11 @@ DRouter主要提供三大功能：界面路由、动作路由、事件总线，�
 ### 如何配置
 1.在BaseModule中添加依赖：
 
-    api 'com.github.Dovar66.DRouter:router-api:1.0.1'
+    api 'com.github.Dovar66.DRouter:router-api:1.0.2'
 
 2.在其他需要用到DRouter的组件中添加注解处理器的依赖：
 
-    annotationProcessor 'com.github.Dovar66.DRouter:router-compiler:1.0.1'
+    annotationProcessor 'com.github.Dovar66.DRouter:router-compiler:1.0.2'
 
     同时在这些组件的defaultConfig中配置注解参数，指定唯一的组件名：
 
