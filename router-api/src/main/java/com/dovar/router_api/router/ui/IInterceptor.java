@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 /**
  * auther by heweizong on 2018/7/20
  * description:拦截器
+ * <p>
+ * 注解处理器引用此类，谨慎修改类名及路径名
  */
 public interface IInterceptor {
     /**

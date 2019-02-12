@@ -2,6 +2,9 @@ package com.dovar.router_api.router.service;
 
 import java.util.HashMap;
 
+/**
+ * 注解处理器引用此类，谨慎修改类名及路径名
+ */
 public abstract class AbsProvider {
 
     private HashMap<String, Action> actions;

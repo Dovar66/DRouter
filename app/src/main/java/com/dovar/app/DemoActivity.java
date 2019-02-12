@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
-import com.dovar.router_annotation.Path;
+import com.dovar.router_annotation.Route;
 import com.dovar.router_api.router.DRouter;
 import com.dovar.router_api.router.eventbus.EventCallback;
 import com.dovar.router_api.router.ui.forresult.Callback;
@@ -18,7 +18,7 @@ import com.example.common_service.Pages;
 import com.example.common_service.Providers;
 import com.example.common_service.ServiceKey;
 
-@Path(path = Pages.APP_MAIN)
+@Route(path = Pages.APP_MAIN)
 public class DemoActivity extends AppCompatActivity {
 
     private Observer<Bundle> mObserver_a;

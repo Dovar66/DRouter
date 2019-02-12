@@ -1,6 +1,6 @@
 package com.dovar.router_compiler;
 
-import com.dovar.router_annotation.Path;
+import com.dovar.router_annotation.Route;
 import com.dovar.router_annotation.Module;
 import com.dovar.router_annotation.Provider;
 import com.dovar.router_annotation.string.RouterStr;
@@ -52,7 +52,7 @@ public class RouterProcessor extends AbstractProcessor {
     public Set<String> getSupportedAnnotationTypes() {
         Set<String> supportTypes = new HashSet<>();
         supportTypes.add(Module.class.getCanonicalName());
-        supportTypes.add(Path.class.getCanonicalName());
+        supportTypes.add(Route.class.getCanonicalName());
         supportTypes.add(Provider.class.getCanonicalName());
         return supportTypes;
     }
@@ -101,7 +101,7 @@ public class RouterProcessor extends AbstractProcessor {
                     .addModifiers(Modifier.PUBLIC)
                     .addSuperinterface(ClassName.get(RouterStr.RouterInjectorPackage, RouterStr.RouterMapCreatorSimpleName));
 
-            Set<? extends Element> uiPath = roundEnv.getElementsAnnotatedWith(Path.class);
+            Set<? extends Element> uiPath = roundEnv.getElementsAnnotatedWith(Route.class);
             generateUIPathMap(mBuilder, uiPath);
             Set<? extends Element> providers = roundEnv.getElementsAnnotatedWith(Provider.class);
             generateServiceMap(mBuilder, providers);
@@ -145,7 +145,7 @@ public class RouterProcessor extends AbstractProcessor {
     }
 
     private void generateUIPathMap(TypeSpec.Builder mBuilder, Set<? extends Element> paths) {
-        debug("Process Path...");
+        debug("Process Route...");
 
         MethodSpec.Builder createUIRouterMap = MethodSpec.methodBuilder("createUIRouterMap")
                 .addModifiers(Modifier.PUBLIC)
@@ -161,10 +161,10 @@ public class RouterProcessor extends AbstractProcessor {
             for (Element e : paths
                     ) {
                 if (e.getKind() == ElementKind.CLASS) {
-                    String path = e.getAnnotation(Path.class).path();
+                    String path = e.getAnnotation(Route.class).path();
                     try {
                         //To get [Class] will throw MirroredTypesException here.
-                        Class cls = e.getAnnotation(Path.class).interceptor();
+                        Class cls = e.getAnnotation(Route.class).interceptor();
                     } catch (MirroredTypesException mte) {
                         List<? extends TypeMirror> typeMirrors = mte.getTypeMirrors();
                         if (typeMirrors != null && typeMirrors.size() > 0) {
@@ -177,8 +177,8 @@ public class RouterProcessor extends AbstractProcessor {
                                             createInterceptorMap.addStatement("mapInterceptor.put(\"" + path + "\",$T.class)", className);
                                         } else {
                                             String entireName = className.packageName() + "." + className.simpleName();
-                                            if (!"java.lang.String".equalsIgnoreCase(entireName)) {//因为默认值为String.class，所以去掉警告
-                                                debug(entireName + "不是有效值，注解Path的interceptor必须是" + RouterStr.IInterceptor_CLASS + "的实现类");
+                                            if (!"com.dovar.router_annotation.NoInterceptor".equalsIgnoreCase(entireName)) {//因为默认值为NoInterceptor.class，所以去掉警告
+                                                debug(entireName + "不是有效值，注解Route的interceptor必须是" + RouterStr.IInterceptor_CLASS + "的实现类");
                                             }
                                         }
                                     }

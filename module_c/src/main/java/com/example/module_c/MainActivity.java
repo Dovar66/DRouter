@@ -5,13 +5,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
-import com.dovar.router_annotation.Path;
+import com.dovar.router_annotation.Route;
 import com.dovar.router_api.router.DRouter;
 import com.dovar.router_api.utils.ProcessUtil;
 import com.example.common_service.Pages;
 import com.example.common_service.ServiceKey;
 
-@Path(path = Pages.C_MAIN)
+@Route(path = Pages.C_MAIN)
 public class MainActivity extends AppCompatActivity {
 
     @Override

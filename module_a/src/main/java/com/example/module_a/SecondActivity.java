@@ -5,11 +5,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
-import com.dovar.router_annotation.Path;
+import com.dovar.router_annotation.Route;
 import com.dovar.router_api.utils.ProcessUtil;
 import com.example.common_service.Pages;
 
-@Path(path = Pages.A_SECOND)
+@Route(path = Pages.A_SECOND)
 public class SecondActivity extends AppCompatActivity {
 
     @Override

@@ -26,7 +26,7 @@ public class ProxyMRT {
             multiResponse.setData((Parcelable) obj);
         } else if (obj != null) {
             //跨进程时必须为Parcelable
-            Debugger.e("createMultiResponse: object must implement Parcelable in MultiRouter");
+            Debugger.e("ProxyMRT: object must implement Parcelable in MultiRouter");
         }
         return multiResponse;
     }

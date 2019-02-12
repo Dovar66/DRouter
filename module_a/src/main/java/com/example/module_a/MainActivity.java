@@ -7,14 +7,14 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.dovar.router_annotation.Path;
+import com.dovar.router_annotation.Route;
 import com.dovar.router_api.router.DRouter;
 import com.dovar.router_api.utils.ProcessUtil;
 import com.dovar.router_api.router.eventbus.EventCallback;
 import com.example.common_service.Pages;
 import com.example.common_service.ServiceKey;
 
-@Path(path = Pages.A_MAIN)
+@Route(path = Pages.A_MAIN)
 public class MainActivity extends AppCompatActivity {
 
     @Override

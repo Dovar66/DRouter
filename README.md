@@ -80,9 +80,9 @@ DRouter主要提供三大功能：界面路由、动作路由、事件总线，�
 
 #### 页面路由
 
-     添加Path注解,可通过interceptor设置拦截器:
+     添加Route注解,可通过interceptor设置拦截器:
 
-     @Path(path = "/b/main", interceptor = BInterceptor.class)
+     @Route(path = "/b/main", interceptor = BInterceptor.class)
      public class MainActivity extends AppCompatActivity {
 
          @Override
@@ -195,14 +195,14 @@ DRouter主要提供三大功能：界面路由、动作路由、事件总线，�
     4.分离公共服务层与基础架构层(非必须)：
     如果之前你的项目没有分离业务层和基础架构层，那么建议你现在将基础架构从common_service中抽离出来.
     
-    5.逐步拆分组件：
+    5.逐步拆分组件：(这个过程短则几天，长则数月，项目越大耦合越重则耗时越长，建议徐徐推进)
         拆分第一个组件：
             * 前面我们已经新增了module_search，所以现在要将搜索模块的代码从common_service中抽离并放入搜索组件，此时搜索组件依然可以直接引用公共服务层的代码，但公共服务层则只能通过路由使用搜索功能.
             * 在开发主线做新需求时，新增的资源文件建议最好放到对应的组件工程中，之前的资源文件可以暂时保留在公共服务层，等待后续由各个组件工程认领走，尽可能少的积压在公共服务层。
             * 权限、Android四大组件、特有的第三方库引用等都应该声明在对应的组件Module中，而不应沉入公共服务层，更不允许进入基础框架层。
         (在第一个组件拆分成功并推入市场后，如果反馈良好，那么就可以继续拆分其他的组件了)
         拆分第二个组件、第三个...
-    组件拆分粒度取决于你的业务模块划分和组员开发职责划分，建议不要拆分出太多的组件。
+    组件拆分粒度取决于你的业务模块和组员职责，请按需拆分。
 
 ### 遇到问题怎么办？
 
@@ -220,22 +220,22 @@ DRouter主要提供三大功能：界面路由、动作路由、事件总线，�
 
 ### MIT License
 
-Copyright (c) 2019 Dovar66
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+    Copyright (c) 2019 Dovar66
+    
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+    
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+    
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.

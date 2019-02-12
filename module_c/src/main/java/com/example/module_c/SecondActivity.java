@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.dovar.router_annotation.Path;
+import com.dovar.router_annotation.Route;
 import com.dovar.router_api.router.DRouter;
 import com.dovar.router_api.utils.ProcessUtil;
 import com.example.common_service.Actions;
@@ -13,7 +13,7 @@ import com.example.common_service.Pages;
 import com.example.common_service.ProcessName;
 import com.example.common_service.Providers;
 
-@Path(path = Pages.C_SECOND)
+@Route(path = Pages.C_SECOND)
 public class SecondActivity extends AppCompatActivity {
 
     @Override
