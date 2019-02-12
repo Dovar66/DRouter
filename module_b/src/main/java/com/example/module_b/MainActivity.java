@@ -8,7 +8,7 @@ import com.dovar.router_annotation.Route;
 import com.dovar.router_api.router.DRouter;
 import com.dovar.router_api.utils.ProcessUtil;
 import com.example.common_service.Actions;
-import com.example.common_service.BaseActivity;
+import com.example.common_service.base.BaseActivity;
 import com.example.common_service.Pages;
 import com.example.common_service.Providers;
 

@@ -10,7 +10,7 @@ import com.dovar.router_api.router.DRouter;
 import com.dovar.router_api.router.ui.forresult.Callback;
 import com.dovar.router_api.utils.ProcessUtil;
 import com.example.common_base.ToastUtil;
-import com.example.common_service.BaseActivity;
+import com.example.common_service.base.BaseActivity;
 import com.example.common_service.Pages;
 
 @Route(path = Pages.A_MAIN)

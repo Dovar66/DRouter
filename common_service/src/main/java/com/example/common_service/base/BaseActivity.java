@@ -1,4 +1,4 @@
-package com.example.common_service;
+package com.example.common_service.base;
 
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
