@@ -6,7 +6,7 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/btn_navigator_a_second"
+        android:id="@+id/btn_navigator_b_second"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="界面跳转" />
@@ -23,6 +23,17 @@
         android:layout_height="wrap_content"
         android:text="界面跳转 + Callback" />
 
+    <Button
+        android:id="@+id/btn_interceptor"
+        android:text="界面跳转(需要登录)"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/btn_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="模拟登录"/>
     <Space
         android:layout_width="1dp"
         android:layout_height="0dp"

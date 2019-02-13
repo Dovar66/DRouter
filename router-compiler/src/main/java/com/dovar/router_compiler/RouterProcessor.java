@@ -134,7 +134,7 @@ public class RouterProcessor extends AbstractProcessor {
                     if (isConcreteSubType(e, RouterStr.Provider_CLASS)) {
                         createProviderMap.addStatement("map.put(\"" + key + "\",$T.class)", className);
                     } else {
-                        debug(className.packageName() + "." + className.simpleName() + "不是有效值，标注为Provider的类必须是" + RouterStr.Provider_CLASS + "的非抽象子类");
+                        debug(className.packageName() + "." + className.simpleName() + "is invalid，target for Annotation Provider must be subtype of " + RouterStr.Provider_CLASS);
                     }
                 }
             }
@@ -178,7 +178,7 @@ public class RouterProcessor extends AbstractProcessor {
                                         } else {
                                             String entireName = className.packageName() + "." + className.simpleName();
                                             if (!"com.dovar.router_annotation.NoInterceptor".equalsIgnoreCase(entireName)) {//因为默认值为NoInterceptor.class，所以去掉警告
-                                                debug(entireName + "不是有效值，注解Route的interceptor必须是" + RouterStr.IInterceptor_CLASS + "的实现类");
+                                                debug(entireName + "is invalid，interceptor value for Annotation Route must be subtype of " + RouterStr.IInterceptor_CLASS);
                                             }
                                         }
                                     }
@@ -191,7 +191,7 @@ public class RouterProcessor extends AbstractProcessor {
                     if (isConcreteSubType(e, "android.app.Activity")) {
                         createUIRouterMap.addStatement("mapActivity.put(\"" + path + "\",$T.class)", className);
                     } else {
-                        debug(className.packageName() + "." + className.simpleName() + "不是有效值，path必须是Activity的非抽象子类");
+                        debug(className.packageName() + "." + className.simpleName() + "is invalid，target for Annotation Route must be subtype of Activity");
                     }
                 }
             }

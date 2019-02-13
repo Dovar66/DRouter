@@ -3,7 +3,7 @@ package com.dovar.router_annotation.string;
 /**
  * @Date: 2018/10/18
  * @Author: heweizong
- * @Description:
+ * @Description: string
  */
 public interface RouterStr {
     String ProxyClassPackage = "com.dovar.router.generate";

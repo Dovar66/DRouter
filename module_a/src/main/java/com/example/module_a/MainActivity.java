@@ -16,6 +16,8 @@ import com.example.common_service.Pages;
 @Route(path = Pages.A_MAIN)
 public class MainActivity extends BaseActivity {
 
+    static boolean IS_ONLINE;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,7 +26,7 @@ public class MainActivity extends BaseActivity {
         TextView tv_info = findViewById(R.id.tv_info);
         tv_info.setText("当前页面：MainActivity\n当前组件：module_a\n当前进程：" + ProcessUtil.getProcessName(this));
 
-        addViewClickEvent(R.id.btn_navigator_a_second, new View.OnClickListener() {
+        addViewClickEvent(R.id.btn_navigator_b_second, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DRouter.navigator(Pages.B_SECOND).navigateTo(MainActivity.this);
@@ -54,6 +56,25 @@ public class MainActivity extends BaseActivity {
                         ToastUtil.show(MainActivity.this, "navigateForCallback:" + s);
                     }
                 });
+            }
+        });
+
+        addViewClickEvent(R.id.btn_interceptor, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DRouter.navigator(Pages.A_THIRD).navigateTo(MainActivity.this);
+            }
+        });
+
+        addViewClickEvent(R.id.btn_login, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (IS_ONLINE) {
+                    ((TextView) v).setText("模拟登录");
+                } else {
+                    ((TextView) v).setText("退出登录");
+                }
+                IS_ONLINE = !IS_ONLINE;
             }
         });
     }
