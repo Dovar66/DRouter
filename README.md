@@ -16,7 +16,8 @@
 
 [DRouter目前已应用于触电新闻](https://sj.qq.com/myapp/detail.htm?apkName=com.touchtv.touchtv)
 
-	DRouter主要提供三大功能：界面路由、动作路由和事件总线，帮助Android开发者更容易地完成项目的组件化改造。特别是对于多进程应用，引入DRouter能够让开发者在不用了解AIDL的情况下就可以进行跨进程通信.
+	DRouter主要提供三大功能：界面路由、动作路由和事件总线，帮助Android开发者更容易地完成项目的组件化改造。
+	特别是对于多进程应用，引入DRouter能够让开发者在不用了解AIDL的情况下就可以进行跨进程通信.
 
 ### 框架特点
 
@@ -28,11 +29,20 @@
 
 ### 如何配置
 
-1.在BaseModule中添加依赖：
+1.在项目根目录的 build.gradle 中添加 JitPack 仓库:
+
+	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+
+2.在BaseModule中添加依赖：
 
     api 'com.github.Dovar66.DRouter:router-api:1.0.5'
 
-2.在其他需要用到DRouter的组件中添加注解处理器的依赖：
+3.在其他需要用到DRouter的组件中添加注解处理器的依赖：
 
     annotationProcessor 'com.github.Dovar66.DRouter:router-compiler:1.0.5'
 
@@ -46,7 +56,7 @@
             }
         }
 
-3.多进程配置：
+4.多进程配置：
 
     * 如果你的项目需要使用多进程广域路由，那么请让你的Application实现 IMultiProcess 接口，广域路由默认是关闭状态，只有实现了该接口才会启用。
 
