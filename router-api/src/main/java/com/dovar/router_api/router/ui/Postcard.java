@@ -17,6 +17,7 @@ import java.io.Serializable;
  * description: 用于界面跳转的通行证
  */
 public final class Postcard {
+    private Context mContext;
     private String path;//跳转Activity的标识路径
     private Bundle mBundle;//跳转携带参数
     private String group;//分组，用于设置拦截器
@@ -39,6 +40,9 @@ public final class Postcard {
         mBundle = new Bundle();
     }
 
+    public Context getContext() {
+        return mContext;
+    }
 
     public String getPath() {
         return path;
@@ -136,22 +140,27 @@ public final class Postcard {
         return this;
     }
 
-    public void navigateTo(Context mContext) {
-        if (null == mContext || TextUtils.isEmpty(getPath()) || null == getDestination()) return;
-        UIRouter.instance().navigate(mContext, this, -1);
+    public void navigateTo(Context context) {
+        if (null == context || TextUtils.isEmpty(getPath()) || null == getDestination()) return;
+        this.mContext = context;
+        UIRouter.instance().navigate(context, this, -1);
     }
 
-    public void navigateForResult(Activity mContext, int requestCode) {
-        if (null == mContext || TextUtils.isEmpty(getPath()) || null == getDestination()) return;
-        UIRouter.instance().navigate(mContext, this, requestCode);
+    public void navigateForResult(Activity activity, int requestCode) {
+        if (null == activity || TextUtils.isEmpty(getPath()) || null == getDestination()) return;
+        this.mContext = activity;
+        UIRouter.instance().navigate(activity, this, requestCode);
     }
 
-    public void navigateForResult(Fragment mContext, int requestCode) {
-        if (null == mContext || TextUtils.isEmpty(getPath()) || null == getDestination()) return;
-        UIRouter.instance().navigate(mContext, this, requestCode);
+    public void navigateForResult(Fragment fragment, int requestCode) {
+        if (null == fragment || TextUtils.isEmpty(getPath()) || null == getDestination()) return;
+        this.mContext = fragment.getContext();
+        UIRouter.instance().navigate(fragment, this, requestCode);
     }
 
-    public void navigateForCallback(FragmentActivity mContext, Callback mCallback) {
-        UIRouter.instance().navigate(mContext, this, mCallback);
+    public void navigateForCallback(FragmentActivity activity, Callback mCallback) {
+        if (null == activity || TextUtils.isEmpty(getPath()) || null == getDestination()) return;
+        this.mContext = activity;
+        UIRouter.instance().navigate(activity, this, mCallback);
     }
 }
