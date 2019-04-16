@@ -15,7 +15,6 @@ import static android.arch.lifecycle.Lifecycle.State.CREATED;
 import static android.arch.lifecycle.Lifecycle.State.DESTROYED;
 
 public abstract class LiveEvent<T> {
-    private final Object mDataLock = new Object();
     static final int START_VERSION = -1;
     private static final Object NOT_SET = new Object();
 
