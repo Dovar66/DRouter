@@ -9,7 +9,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath "gradle.plugin.RouterPlugin:plugin:2.0.0"
+        classpath "gradle.plugin.RouterPlugin:plugin:2.0.1"
     }
 }
 

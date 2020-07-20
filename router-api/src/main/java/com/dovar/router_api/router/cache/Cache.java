@@ -2,9 +2,7 @@ package com.dovar.router_api.router.cache;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.pm.PackageManager;
 
-import com.dovar.router_annotation.string.RouterStr;
 import com.dovar.router_api.compiler.RouterInjector;
 import com.dovar.router_api.compiler.RouterMapCreator;
 import com.dovar.router_api.router.service.AbsProvider;
@@ -13,7 +11,7 @@ import com.dovar.router_api.router.ui.IInterceptor;
 import com.dovar.router_api.router.ui.UIRouter;
 import com.dovar.router_api.utils.Debugger;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,12 +35,10 @@ public class Cache {
      */
     public static void initByCompiler(Application app) {
         if (app == null) return;
-        //通过注解生成的代理类的存放路径，最末位的“.”不能省略，否则会匹配到com.dovar.router_api包
-        String mProxyClassPackage = RouterStr.ProxyClassPackage + ".";
-        try {
-            classFileNames = ClassUtil.getFileNameByPackageName(app, mProxyClassPackage);
+        classFileNames = getProxyClassesByJavassist();
+        if (classFileNames != null) {
             for (String mProxyClassFullName : classFileNames
-                    ) {
+            ) {
                 //前面找到的classFileNames中可能会存在非xxxInjector子类
                 //所以在循环内捕获proxyClass.newInstance()的异常
                 try {
@@ -65,13 +61,20 @@ public class Cache {
                     e.printStackTrace();
                 }
             }
-        } catch (IOException | PackageManager.NameNotFoundException mE) {
-            mE.printStackTrace();
         }
 
         UIRouter.instance().initActivityMap(mActivityMap);
         UIRouter.instance().initInterceptorMap(mInterceptorMap);
         ServiceLoader.instance().initProviderMap(mProviderMap);
+    }
+
+    private static List<String> getProxyClassesByJavassist() {
+        try {
+            return (ArrayList<String>) JavassistGenerateMethod.getProxyClassNames();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private static List<String> classFileNames;
@@ -82,7 +85,7 @@ public class Cache {
             return;
         }
         for (String mProxyClassFullName : classFileNames
-                ) {
+        ) {
             //前面找到的classFileNames中可能会存在非xxxInjector子类
             //所以在循环内捕获proxyClass.newInstance()的异常
             try {

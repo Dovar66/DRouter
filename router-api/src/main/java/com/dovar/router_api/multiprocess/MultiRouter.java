@@ -14,6 +14,7 @@ import android.text.TextUtils;
 
 import com.dovar.router_api.ILocalRouterAIDL;
 import com.dovar.router_api.router.ProxyRT;
+import com.dovar.router_api.router.cache.JavassistGenerateMethod;
 import com.dovar.router_api.utils.Debugger;
 import com.dovar.router_api.utils.ProcessUtil;
 
@@ -65,7 +66,7 @@ class MultiRouter {
 
     private static void getRegisterByJavassist(Application app) {
         try {
-            HashMap<String, Class> maps = (HashMap<String, Class>) getTargetService();
+            HashMap<String, Class> maps = (HashMap<String, Class>) JavassistGenerateMethod.getTargetService();
             for (Map.Entry<String, Class> entry : maps.entrySet()
                     ) {
                 String process = entry.getKey();
@@ -77,28 +78,6 @@ class MultiRouter {
         } catch (Exception e) {
             Debugger.e(e.getMessage());
         }
-    }
-
-    /**
-     * gradle插件会修改这个方法，插入类似如下代码:
-     * Map hashMap = new HashMap();
-     * hashMap.put(":a", CommuStubService0.class);
-     * hashMap.put(":b", CommuStubService1.class);
-     * hashMap.put("c", CommuStubService2.class);
-     * hashMap.put(":d", CommuStubService3.class);
-     * hashMap.put("e", CommuStubService4.class);
-     * hashMap.put(":f", CommuStubService5.class);
-     * hashMap.put(":g", CommuStubService6.class);
-     * hashMap.put("h", CommuStubService7.class);
-     * hashMap.put(":i", CommuStubService8.class);
-     * hashMap.put(":j", CommuStubService9.class);
-     * hashMap.put(":k", CommuStubService10.class);
-     * return hashMap;
-     */
-    //由于javassist不支持泛型，故不能返回Class,只能返回Object
-    private static Object getTargetService() {
-
-        return null;
     }
 
     void connectLocalRouter(final String process) {
