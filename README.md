@@ -40,11 +40,11 @@
 
 2.在BaseModule中添加依赖：
 
-    api 'com.github.Dovar66.DRouter:router-api:1.0.8'
+    api 'com.github.Dovar66.DRouter:router-api:1.1.0'
 
 3.在其他需要用到DRouter的组件中添加注解处理器的依赖：
 
-    annotationProcessor 'com.github.Dovar66.DRouter:router-compiler:1.0.8'
+    annotationProcessor 'com.github.Dovar66.DRouter:router-compiler:1.1.0'
 
     同时在这些组件的defaultConfig中配置注解参数，指定唯一的组件名：
 
